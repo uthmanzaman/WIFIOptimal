@@ -1,15 +1,29 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+//import { navigationRef, isReadyRef } from './Navigation/RootNavigation';
+import {NavigationContainer} from "@react-navigation/native";
+import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
+import acessPoint from "./screens/AcessPoint";
+import SpeedTest from "./screens/SpeedTest";
 
-export default function App() {
+
+
+
+export const App = () => {
+  const Tab = createBottomTabNavigator();
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+       <Tab.Navigator>
+        <Tab.Screen name ="AcessPoints" Component={acessPoint}/>
+      </Tab.Navigator>
+      {/* <Tab.Navigator>
+        <Tab.Screen name ="SpeedTest" Component={SpeedTest}/>
+      </Tab.Navigator> */}
+    </NavigationContainer>
+    
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -19,3 +33,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+
+
