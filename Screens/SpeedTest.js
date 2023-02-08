@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 import {
     StyleSheet,
@@ -6,16 +6,15 @@ import {
     View
 } from 'react-native';
 
-
-const acessPoint = () => {
+export const SpeedTest = () => {
     return (
-        <View>
-            <Text>
-                acessPoint
+        <View style={styles.container}>
+            <Text style={styles.title}>
+                speedTest
             </Text>
         </View>
     );
-};
+}
 
 
 const styles = StyleSheet.create({
@@ -23,7 +22,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#F5FCFF',
+        backgroundColor: '#ffc125',
     },
     title: {
         fontSize: 20,
@@ -32,4 +31,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default acessPoint;
+export default SpeedTest; 
