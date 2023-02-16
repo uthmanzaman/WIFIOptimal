@@ -6,39 +6,59 @@ import {
   FlatList,
   Button,
   Alert,
+  Modal,
   TouchableOpacity
 } from 'react-native';
 import { getAuth, signOut } from "firebase/auth";
-//import {deviceInfo} from '../deviceInfo';
+import { getWifiName } from '../deviceInfo';
+import DeviceInfo from 'react-native-device-info';
+import { DeviceType } from 'expo-device';
 
 
 
 
-const DevicesPage = ({ navigation }) => {      
-  const [netInfoObject, setNetInfoObject] = useState({ name: '' });    
-
+const DevicesPage = ({ navigation }) => {
+  const [netInfoObject, setNetInfoObject] = useState({ deviceName: '' });
+  const [showModal, setShowModal] = useState(false)
 
   function DataView() {    // Data view of netinforobject which goes into connected devices box
     return (
-      <TouchableOpacity style={styles.listItem} onPress={connectedDevicesObject}>
-        <Text style={styles.dataViewText}>{netInfoObject.name}</Text>
-        <Text style={styles.dataViewText}>{netInfoObject.secondName}</Text>
+      <TouchableOpacity style={styles.listItem} onPress={() => setShowModal(true)} >
+        <View>
+          <Text style={styles.dataViewText}>{netInfoObject.name}</Text>
+          <Text style={styles.dataViewText}>Device Name: {netInfoObject.deviceName}</Text>
+          <Text style={styles.dataViewText}>IP Address: {netInfoObject.ipAddress}</Text>
+          <Text style={styles.dataViewText}>{netInfoObject.dType}</Text>
+          <Text style={styles.dataViewText}>{netInfoObject.modelName}</Text>
+        </View>
+
+
       </TouchableOpacity>)
   }
 
-  function connectedDevicesObject() {     // Alerts when conected devices pressed 
-    Alert.alert("Hello");
-  }
-  
   function getNetInfo() {         //sets netinforobject to parameters
-    const data = setNetInfoObject({ name: 'Connected', secondName: 'Devices' })
+    const data = setNetInfoObject({ name: '', deviceName: '', ipAddress: '', dType: '', modelName: '' })
+    DeviceInfo.getDeviceName().then((sdkName) => {
+      setNetInfoObject(prevState => ({ ...prevState, deviceName: sdkName }));
+    });
+    DeviceInfo.getIpAddress().then((ipAdd) => {
+      setNetInfoObject(prevState => ({ ...prevState, ipAddress: ipAdd }));
+    });
+    // DeviceInfo.getType().then((deviceType) => {
+    //   setNetInfoObject(prevState => ({ ...prevState, dType: deviceType }));
+    // });
+    // DeviceInfo.getDevice().then((testN) => {
+    //   setNetInfoObject(prevState => ({ ...prevState, name: testN }));
+    // });
+
+    // let model = DeviceInfo.getModel();
+    // setNetInfoObject(prevState => ({ ...prevState, modelName: model }));
+
     return () => {
       data()
-      unsubscribe();
-
     }
   }
-  
+
   useEffect(() => {        // Displays netinfoobject information when devices page is loaded up
     getNetInfo()
   }, [])
@@ -58,40 +78,50 @@ const DevicesPage = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>"Wifi Network Name"</Text>
+      <Text style={styles.header}>Connected Devices</Text>
       <View></View>
       <DataView />
-      <Button onPress={() => logout()} title="SignOut" />
-      <Button title="TESTING DATA" onPress={() => { getNetInfo(); console.log(netInfoObject) }}></Button>
-    </View>
+      <DataView />
+      <DataView />
 
+      <Button onPress={() => logout()} title="SignOut" />
+      <Button onPress={() => getWifiName} title="WifiName" />
+      <Modal visible={showModal} transparent={true}>
+        <View style={{ flex: 1, backgroundColor: 'black' }}>
+          <Text>Hello</Text>
+          <Button title="Go back" onPress={() => setShowModal(false)} />
+        </View>
+      </Modal>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: "space-evenly",
     height: '100%',
     alignItems: 'center',
-    backgroundColor: '#0096D6',
+    backgroundColor: '#FFFBFA',
 
   },
   header: {
-
     fontSize: 20,
     textAlign: 'left',
     marginTop: 50,
-    color: '#ffffff',
+    color: 'black',
     marginVertical: 15,
   },
   listItem: {
+    flex: 0.1,
     padding: 20,
     borderWidth: 1,
-    borderColor: 'green',
+    borderColor: '',
     color: '#fff',
-    backgroundColor: '#1DA1F2',
+    backgroundColor: '#7692FF',
     width: '90%',
     borderRadius: 15,
+    justifyContent: 'center'
 
   },
   dataViewText: {
@@ -100,6 +130,10 @@ const styles = StyleSheet.create({
     color: '#ffffff',
 
   },
+  Button: {
+    marginVertical: 10,
+    backgroundColor: 'red',
+  }
 });
 
 export default DevicesPage;

@@ -4,21 +4,36 @@ import {
   Text,
   View
 } from 'react-native';
-import {useDeviceName, useIsEmulator} from 'react-native-device-info';
-
-
-const deviceInfo = () => {
-    let deviceI = {};
-    deviceI.deviceName = useDeviceName();
-    deviceI.isEmulator = useIsEmulator();
+//import {useDeviceName, useIsEmulator, getUniqueId} from 'react-native-device-info';
+import * as Device from 'expo-device';
+import WifiManager from "react-native-wifi-reborn";
 
 
 
 
-    return (
-        <Text>{JSON.stringify(deviceI, null, '')}</Text>
-    )
+function getWifiName(){
 
+  WifiManager.getCurrentWifiSSID().then(
+    ssid => {
+      console.log("Your current connected wifi SSID is " + ssid);
+    },
+    () => {
+      console.log("Cannot get current SSID!");
+    }
+  )
 }
 
-export default deviceInfo;
+const styles = StyleSheet.create({
+
+  header: {
+
+    fontSize: 20,
+    textAlign: 'left',
+    marginTop: 50,
+    color: '#ffffff',
+    marginVertical: 15,
+  },
+
+})
+
+export default getWifiName;
