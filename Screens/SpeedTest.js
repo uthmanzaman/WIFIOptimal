@@ -5,6 +5,19 @@ import {
     Text,
     View
 } from 'react-native';
+import { isBlock } from 'typescript';
+// import { measureConnectionSpeed } from 'react-native-network-bandwith-speed';
+
+
+// getNetworkBandwidth = async () => {
+//     try {
+//       const networkSpeed = await measureConnectionSpeed();
+//       console.log(networkSpeed); // Network bandwidth speed 
+//     } catch (err) {
+//       console.log(err);  
+//     }
+//   }
+
 
 export const SpeedTest = () => {
     return (
@@ -28,7 +41,15 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center',
         margin: 10,
-    }
+    },
+    // loader: {
+    //     display : inline-isBlock,
+    //     hieght: 240,
+    //     width: 240,
+    //     borderRadius: 50,
+    //     background: conic-gradient(rgba(1, 182, 190, 0.3) ,0% transparent)
+
+    // }
 });
 
 export default SpeedTest; 
