@@ -35,6 +35,8 @@ target 'WIFIOptimal' do
     # :flipper_configuration => !ENV['CI'] ? FlipperConfiguration.enabled : FlipperConfiguration.disabled,
   )
 
+
+
   post_install do |installer|
     react_native_post_install(
       installer,
@@ -55,6 +57,7 @@ target 'WIFIOptimal' do
       end
     end
   end
+
 
   post_integrate do |installer|
     begin

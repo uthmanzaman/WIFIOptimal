@@ -90,8 +90,9 @@ const DevicesPage = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Connected Devices</Text>
-      <View></View>
+    <View style={styles.header}>
+         <Text style={styles.headerText}>Connected Devices</Text>
+      </View>
       <DataView />
    
 
@@ -105,6 +106,7 @@ const DevicesPage = ({ navigation }) => {
         </View>
       </Modal>
       
+      
     </View>
   );
 };
@@ -112,19 +114,38 @@ const DevicesPage = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "space-evenly",
-    height: '100%',
-    alignItems: 'center',
-    backgroundColor: '#FFFBFA',
-
+    backgroundColor: '#fff',
+    padding: 16
   },
   header: {
-    fontSize: 18,
-    textAlign: 'left',
+    paddingVertical: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    width: '100%',
+    alignItems: 'center',
+  },
+  headerText: {
+    fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 50,
-    color: 'White',
-    marginVertical: 15,
+  },
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  button: {
+    width: 100,
+    height: 100,
+    borderRadius: 60,
+    backgroundColor: '#007AFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   listItem: {
     flex: 0.1,
@@ -142,9 +163,6 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     color: '#ffffff',
     margin: 10,
-    
-
-
   },
   Button: {
     marginVertical: 10,

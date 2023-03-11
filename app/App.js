@@ -2,21 +2,19 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import Ionic from 'react-native-vector-icons/Ionicons'
 import MCIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { KeyboardAvoidingView, StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginScreen from '../Screens/LogIn';
 import SignupScreen from '../Screens/SignUp';
-import AcessPoint from '../Screens/AcessPoint';
+import SettingsPage from '../Screens/SettingsPage';
 import SpeedTest from '../Screens/SpeedTest';
 import WIFICoverage from '../Screens/WIFICoverage';
 import DevicesPage from '../Screens/DevicesPage';
-import Providers from '../navigation';
 
 
 
-import WifiManager from "react-native-wifi-reborn";
+
 
 const AppStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -59,7 +57,6 @@ const App = () => {
 
 
   
-  //return <Providers/>
   const TabsNav = () => {
     return (
 
@@ -67,10 +64,10 @@ const App = () => {
         screenOptions={({ route, }) => ({
           tabBarIcon: ({ focused, size, color }) => {
             let iconName;
-            if (route.name === 'Acess Point') {
-              iconName = focused ? "access-point" : "access-point"
+            if (route.name === 'Settings Page') {
+              iconName = focused ? "settings" : "settings-outline"
               size = focused ? size + 8 : size + 5;
-              return <MCIcons name={iconName} size={size} color={color} />;
+              return <Ionic name={iconName} size={size} color={color} />;
             } else if (route.name === 'Devices Page') {
               iconName = focused ? "devices" : "devices"
               size = focused ? size + 8 : size + 5;
@@ -89,9 +86,9 @@ const App = () => {
           headerShown:false
         })}>
         <Tab.Screen name='Devices Page' component={DevicesPage} />
-        <Tab.Screen name='Acess Point' component={AcessPoint} />
         <Tab.Screen name='Speed Test' component={SpeedTest} />
         <Tab.Screen name='WIFI Coverage' component={WIFICoverage} />
+        <Tab.Screen name='Settings Page' component={SettingsPage} />
       </Tab.Navigator>
 
 

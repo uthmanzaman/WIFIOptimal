@@ -86,25 +86,6 @@ const SignUp = ({ navigation }) => {
         <Text style={styles.color_textPrivate}> and</Text>
         <Text style={[styles.color_textPrivate, { color: '#e88832' }]}> Privacy Policy</Text>
       </View>
-      {/* {Platform.OS === 'android' ? (
-        <View>
-          <SocialButton
-            buttonTitle="Sign In with Facebook"
-            btnType="facebook"
-            color="#4867aa"
-            backgroundColor="#e6eaf4"
-            onPress={() => fbLogin()}
-          />
-
-          <SocialButton
-            buttonTitle="Sign In with Google"
-            btnType="google"
-            color="#de4d41"
-            backgroundColor="#f5e7ea"
-            onPress={() => googleLogin()}
-          />
-        </View>
-      ) : null} */}
 
       <TouchableOpacity
         style={styles.navButton}
