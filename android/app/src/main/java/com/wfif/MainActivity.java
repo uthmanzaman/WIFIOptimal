@@ -1,4 +1,4 @@
-package com.wifioptimal;
+package com.wfif;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -10,6 +10,9 @@ import com.facebook.react.ReactRootView;
 import expo.modules.ReactActivityDelegateWrapper;
 
 public class MainActivity extends ReactActivity {
+
+  
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     // Set the theme to AppTheme BEFORE onCreate to support 
