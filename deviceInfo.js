@@ -1,14 +1,31 @@
-import React, { useContext, useEffect, useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
+import React from 'react'
 //import {useDeviceName, useIsEmulator, getUniqueId} from 'react-native-device-info';
-import * as Device from 'expo-device';
-import WifiManager from "react-native-wifi-reborn";
+//import * as Device from 'expo-device';
+import WifiManager from "react-native-wifi-reborn"
 
+import PermissionsAndroid from 'react-native';
 
+const requestLocationPersmission = () => {
+
+const granted =  PermissionsAndroid.request(
+  PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: 'Location permission is required for WiFi connections',
+        message:
+          'This app needs location permission as this is required  ' +
+          'to scan for wifi networks.',
+        buttonNegative: 'DENY',
+        buttonPositive: 'ALLOW',
+      }
+);
+
+if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  getWifiName()
+} else {
+  console.log('Location Permission Denied')
+}
+
+}
 
 
 function getWifiName(){
@@ -23,17 +40,7 @@ function getWifiName(){
   )
 }
 
-const styles = StyleSheet.create({
 
-  header: {
 
-    fontSize: 20,
-    textAlign: 'left',
-    marginTop: 50,
-    color: '#ffffff',
-    marginVertical: 15,
-  },
-
-})
 
 export default getWifiName;

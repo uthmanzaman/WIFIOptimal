@@ -7,7 +7,7 @@
       "**/*"
     ],
     "android": {
-      "package": "com.wfif"
+      "package": "com.wifioptimal"
     },
     "ios": {
       "bundleIdentifier": "com.wifi.ios"

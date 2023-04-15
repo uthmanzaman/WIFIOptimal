@@ -1,27 +1,26 @@
-import React, { useContext, useEffect, useState } from 'react';
+/* eslint-disable react/prop-types */
+import React, {  useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
   View,
-  FlatList,
   Button,
-  Alert,
   Modal,
-  TouchableOpacity
+  TouchableOpacity,
+  PermissionsAndroid
 } from 'react-native';
 import { getAuth, signOut } from "firebase/auth";
-import { getWifiName } from '../deviceInfo';
+import { requestLocationPersmission, getWifiName } from '../deviceInfo';
 //import DeviceInfo from 'react-native-device-info';
 import * as  Device  from 'expo-device';
+import * as Network from 'expo-network';
+import WifiManager from "react-native-wifi-reborn"
 
-
-
-
-
+//import {DeviceDiscoveryManager} from "app/DeviceDiscoveryManager"
 
 const DevicesPage = ({ navigation }) => {
 
-  // const socket = dgram.createSocket('udp4')
+  
 
   // socket.bind(5000)
   // socket.once('listening', function() {
@@ -32,38 +31,46 @@ const DevicesPage = ({ navigation }) => {
   //   })
   // })
   
-  // socket.on('message', function(msg, rinfo) {
-  //   console.log('Message received', msg)
-  // })
+  
 
   const [netInfoObject, setNetInfoObject] = useState({ deviceName: '' });
   const [showModal, setShowModal] = useState(false)
   const [deviceList, setDeviceList] = useState([]);
+  const [ipA, setIp] = useState({});
+  export const [wifiName, SetWifiName] = useState([]);
+
 
   const getAllDevices = () => {
+
+    requestLocationPersmission();
+   
 
     var Client = require('react-native-ssdp').Client,
     client = new Client();
 
-    client.search('ssdp:all');
-    
-    //client.search('urn:dial-multiscreen-org:service:dial:1');
-
+    //client.search('ssdp:all');
+    client.search('urn:dial-multiscreen-org:service:dial:1');
+    //client.search('urn:schemas-upnp-org:service:ContentDirectory:1');
 
 
     client.on('response', function (headers, code, rinfo) {
       console.log('Got a response to an m-search:\n%d\n%s\n%s', code, JSON.stringify(headers, null, '  '), JSON.stringify(rinfo, null, '  '))
       const url = new URL(headers.LOCATION);
       if (url != null) {
-        setDeviceList(deviceList => {
-          return [...deviceList, url]
+        setDeviceList(currentDeviceList => {
+          return [...currentDeviceList, url]
        })
-       
        //console.log(deviceList)
     }});
+
+    return (
+      <View>
+          <DataView/> 
+      </View>
+
+    )
     
     //client.search('urn:dial-multiscreen-org:service:dial:1');
-
     
   //   client.on('response', function (headers) {
   //     const url = new URL(headers.LOCATION);
@@ -75,17 +82,67 @@ const DevicesPage = ({ navigation }) => {
   // }});
     };
 
+    // function getIp(){
+    //   const data = setIp({ipAddress: '' }) //Keys for object ()
+
+    //   const ip =  Network.getIpAddressAsync()
+    //   .then => (ipAdd)
+    //   Device.modelName.then((ipAdd) => {
+    //        setNetInfoObject(prevState => ({ ...prevState, ipAddress: ipAdd }));
+    //      });
+    
+    //   setIp(ip)
+    // };
+
+    const requestLocationPersmission = async() => {
+
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            {
+              title: 'Location permission is required for WiFi connections',
+              message:
+                'This app needs location permission as this is required  ' +
+                'to scan for wifi networks.',
+              buttonNegative: 'DENY',
+              buttonPositive: 'ALLOW',
+            }
+      );
+      
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        getWifiName()
+      } else {
+        console.log('Location Permission Denied')
+      }
+      
+    
+    function getWifiName(){
+
+      WifiManager.getCurrentWifiSSID().then(
+        ssid => {
+          console.log("Your current connected wifi SSID is " + ssid);
+          SetWifiName(ssid)
+
+        },
+        () => {
+          console.log("Cannot get current SSID!");
+        }
+      )
+    }
+  }
+
 
   function DataView() {    // Data view of netinforobject which goes into connected devices box
     
-    
+    //console.log(ipA)
 
     return (
-      <TouchableOpacity style={styles.listItem}  iconType="phone" onPress={() => setShowModal(true)} >
+      <TouchableOpacity style={styles.listItem} onPress={() => setShowModal(true)} >
         <View>
           
           <Text style={styles.dataViewText} >Device Name: {Device.deviceName}</Text>
-          <Text style={styles.dataViewText}>IP Address {netInfoObject.ipAdd}</Text>
+          <Text style={styles.dataViewText}> OS: {Device.osName}</Text>
+          <Text style={styles.dataViewText}> IP add: {}</Text>
+          
         </View>
       </TouchableOpacity>)
   }
@@ -94,44 +151,29 @@ const DevicesPage = ({ navigation }) => {
     return (
         <View>
           <Text style={styles.dataViewText}><Text style={styles.header} >Device Name:</Text> {'   '}{Device.deviceName}</Text>
-          {/* <Text style={styles.dataViewText}><Text style={styles.header} >IP Address:</Text> {'   '}{netInfoObject.ipAddress}</Text>
-          <Text style={styles.dataViewText}><Text style={styles.header} >Name:</Text> {'   '}{netInfoObject.name}</Text>
-          <Text style={styles.dataViewText}><Text style={styles.header} >Device Type:</Text> {'   '}{netInfoObject.dType}</Text>
-          <Text style={styles.dataViewText}><Text style={styles.header} >Model Name:</Text> {'   '}{netInfoObject.modelName}</Text>
-          <Text style={styles.dataViewText}><Text style={styles.header} >MAC Address:</Text> {'   '}{netInfoObject.macAddress}</Text>
-    */}
+          <Text style={styles.dataViewText}><Text style={styles.header} >Model:</Text> {'   '}{Device.modelName}</Text>
+          <Text style={styles.dataViewText}><Text style={styles.header} >Brand:</Text> {'   '}{Device.brand}</Text>
+          <Text style={styles.dataViewText}><Text style={styles.header} >OS:</Text> {'   '}{Device.osName}</Text>
+    
         </View> 
     )
   }
 
-  function getNetInfo() {         //sets netinforobject to parameters
-    const data = setNetInfoObject({ deviceName: '', ipAddress: '', dType: '', modelName: '', macAddress: '' }) //Keys for object (netinfo)
-    Device.deviceName;
-    setNetInfoObject(Device.deviceName) 
-    //  => {
-    //   setNetInfoObject(prevState => ({ ...prevState, deviceName: deviceName }));
-    // };
-    // Device.modelName.then((ipAdd) => {
-    //   setNetInfoObject(prevState => ({ ...prevState, ipAddress: ipAdd }));
-    // });
-    // Device.brand.then((deviceType) => {
-    //   setNetInfoObject(prevState => ({ ...prevState, dType: deviceType }));
-    // });
-    // Device.osBuildId.then((testN) => {
-    //   setNetInfoObject(prevState => ({ ...prevState, name: testN }));
-    // });
-    // Device.osName.then((mac) => {
-    //   setNetInfoObject(prevState => ({ ...prevState, macAddress: mac }));
-    // });
+  // function getNetInfo() {         //sets netinforobject to parameters
+  //   const data = setNetInfoObject({ deviceName: '', ipAddress: '', dType: '', modelName: '', macAddress: '' }) //Keys for object (netinfo)
+  //   Device.deviceName;
+  //   setNetInfoObject(Device.deviceName) 
     
-    return () => {
-      data()
-    }
-  }
+  //   return () => {
+  //     data()
+  //   }
+  // }
 
   useEffect(() => {        // Displays netinfoobject information when devices page is loaded up
-    getNetInfo()
-    // getAllDevices();
+    //getNetInfo()
+    //getAllDevices();
+    //DeviceDiscoveryManager();
+    //requestLocationPersmission();
 
   }, [])
 
@@ -145,34 +187,33 @@ const DevicesPage = ({ navigation }) => {
       })
     navigation.navigate('Login')
     //.catch(error =>(error.message))
-  };
+  }
 
 
   return (
     <View style={styles.container}>
-    <View style={styles.header}>
+      <View style={styles.header}>
          <Text style={styles.headerText}>Connected Devices</Text>
+         <Text style={styles.headerText}>{[wifiName]}</Text>
       </View>
+
       <TouchableOpacity style={styles.button} onPress={() => getAllDevices()}>
          <Text style={styles.buttonText}>Scan Network</Text>
        </TouchableOpacity>
-       <DataView/>
-      
 
+       {/* <DataView/> */}
       <Button style={styles.listItem}  onPress={() => logout()} title="SignOut" />
-      
-      
+
       <Modal visible={showModal} transparent={true}>
         <View style={styles.modalStyle}>
           <ModalDataView />
           <Button title="Go back" onPress={() => setShowModal(false)} />
         </View>
       </Modal>
-      
-      
+
     </View>
   );
-};
+  };
 
 const styles = StyleSheet.create({
   container: {
@@ -216,21 +257,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   listItem: {
-    flex: 0.1,
+    flex: 0.15,
     padding: 20,
     borderWidth: 1,
     borderColor: '',
     backgroundColor: '#007AFF',
     width: '90%',
     borderRadius: 15,
-    justifyContent: 'center'
+    justifyContent: 'center',
+
 
   },
   dataViewText: {
     fontSize: 16,
     textAlign: 'left',
     color: '#ffffff',
-    margin: 10,
+    margin: 5,
+
   },
   Button: {
     marginVertical: 10,
@@ -238,13 +281,12 @@ const styles = StyleSheet.create({
   },
   modalStyle: {
     width: '90%',
-    flex: .8, 
+    flex: .7, 
     backgroundColor: 'grey', 
     margin: 20,
-    marginTop: 100,
+    marginTop: 150,
     borderRadius: 20,
-    justifyContent: 'center'
-    
+    justifyContent: 'center',
   }
 });
 

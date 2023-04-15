@@ -1,8 +1,11 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getFirestore, initializeFirestore  } from "firebase/firestore";
+
 
 //import { getAnalytics } from "firebase/analytics";
+          
 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -24,15 +27,13 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 
-// Initialize Firebase
-
-// let app;
-// if (firebase.apps.length === 0 ){
-//     app = firebase.initializeApp(firebaseConfig);
-// } else {
-//     app = firebase.app()
-// }
+// init services 
+const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true
+  })
 
 
 
-export {auth};
+
+
+export {db,auth};

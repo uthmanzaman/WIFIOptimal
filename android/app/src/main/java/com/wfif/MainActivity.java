@@ -1,4 +1,4 @@
-package com.wfif;
+package com.wifioptimal;
 
 import android.os.Build;
 import android.os.Bundle;

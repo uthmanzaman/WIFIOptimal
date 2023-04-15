@@ -1,4 +1,4 @@
-package com.wfif.newarchitecture.components;
+package com.wifioptimal.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

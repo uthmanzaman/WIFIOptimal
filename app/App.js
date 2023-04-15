@@ -21,38 +21,38 @@ const Tab = createBottomTabNavigator();
 
 
 
-export const requestWifiPermission = async () => {
-  try {
-    await request(
-      Platform.select({
-        android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-        ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
-      }),
-    );
-  } catch (err) {
-    console.warn(err);
-  }
-};
+// export const requestWifiPermission = async () => {
+//   try {
+//     await request(
+//       Platform.select({
+//         android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+//         ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+//       }),
+//     );
+//   } catch (err) {
+//     console.warn(err);
+//   }
+// };
 
 const App = () => {
 
 
 
 
-    getSsid = async () => {
-      if (this.state.requestPermission) {
-        await requestWifiPermission();
-        this.setState({ ...this.state, requestPermission: false });
-      }
-      try {
-        let state = await NetInfo.fetch();
-        let ssid = state.details.ssid ? state.details.ssid : 'error';
-        console.warn("Gateway SSID", state);
-        this.setState({ gateway: { ...this.state.gateway, wirelessSSID: ssid } });
-      } catch (e) {
-        console.log(e);
-      }
-    };
+    // getSsid = async () => {
+    //   if (this.state.requestPermission) {
+    //     await requestWifiPermission();
+    //     this.setState({ ...this.state, requestPermission: false });
+    //   }
+    //   try {
+    //     let state = await NetInfo.fetch();
+    //     let ssid = state.details.ssid ? state.details.ssid : 'error';
+    //     console.warn("Gateway SSID", state);
+    //     this.setState({ gateway: { ...this.state.gateway, wirelessSSID: ssid } });
+    //   } catch (e) {
+    //     console.log(e);
+    //   }
+    // };
 
 
 

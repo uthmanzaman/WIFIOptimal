@@ -1,4 +1,4 @@
-package com.wfif.newarchitecture.modules;
+package com.wifioptimal.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;
