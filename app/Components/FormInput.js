@@ -1,6 +1,8 @@
 import React from 'react';
-import {View, TextInput, StyleSheet} from 'react-native';
+import {View, Text, TextInput, StyleSheet, TouchableOpacity} from 'react-native';
 import {windowHeight, windowWidth} from '../utils/Dimensions';
+
+import { COLORS, SIZES, FONTS } from "../constants";
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
@@ -19,6 +21,31 @@ const FormInput = ({labelValue, placeholderText, iconType, ...rest}) => {
         {...rest}
       />
     </View>
+  );
+};
+export const RectButton = ({ minWidth, fontSize, handlePress, ...props }) => {
+  return (
+    <TouchableOpacity
+      style={{
+        backgroundColor: COLORS.primary,
+        padding: SIZES.small,
+        borderRadius: SIZES.extraLarge,
+        minWidth: minWidth,
+        ...props,
+      }}
+      onPress={handlePress}
+    >
+      <Text
+        style={{
+          fontFamily: FONTS.semiBold,
+          fontSize: fontSize,
+          color: COLORS.white,
+          textAlign: "center",
+        }}
+      >
+        Place a bid
+      </Text>
+    </TouchableOpacity>
   );
 };
 

@@ -1,49 +1,50 @@
-import React, { useContext, useState } from 'react';
+/* eslint-disable react/prop-types */
+import React, {useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
-  Image,
-  Platform,
   StyleSheet,
-  ScrollView
+  SafeAreaView,
 } from 'react-native';
-import FormInput from '../app/Components/FormInput';
-import FormButton from '../app/Components/FormButton';
-import {AuthContext} from '../navigation/AuthProvider';
-
-//import auth from '@react-native-firebase/auth';
-
+import { FormInput, FormButton } from "../app/Components";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-
+import { COLORS } from "../app/constants";
 
 
 const SignUp = ({ navigation }) => {
 
-  const register = useContext(AuthContext);
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
+  
 
   function handleSignUp(){
+
+    if (!passwordValidation(password,confirmPassword)){
+      //errorFlag = true;
+      alert ("Password and confirm password should be same.")
+      return;
+    }
+
   const auth = getAuth(); 
     createUserWithEmailAndPassword(auth,email, password)
     .then (userCredentials => {
-      const user = userCredentials.user;
+      const user = userCredentials;
       console.log ('Registered with',user.email);
-      navigation.navigate('TabsNav')
-    })
+      navigation.navigate("Login");
+    })  
     .catch(error => alert(error.message))
   }
+
+  const passwordValidation= (password,confirmPassword) =>{
+    if (password &&  confirmPassword && password === confirmPassword ) return true;
+    return false;
+  }
   
-  
-
-
-
 
   return (
+    <SafeAreaView>
     <View style={styles.container}>
       <Text style={styles.text}>Create an account</Text>
 
@@ -56,7 +57,6 @@ const SignUp = ({ navigation }) => {
         autoCapitalize="none"
         autoCorrect={false}
       />
-
       <FormInput
         labelValue={password}
         onChangeText={(userPassword) => setPassword(userPassword)}
@@ -64,10 +64,9 @@ const SignUp = ({ navigation }) => {
         iconType="lock"
         secureTextEntry={true}
       />
-
       <FormInput
         labelValue={confirmPassword}
-        onChangeText={(userPassword) => setPassword(userPassword)}
+        onChangeText={(userPassword) => setConfirmPassword(userPassword)}
         placeholderText="Confirm Password"
         iconType="lock"
         secureTextEntry={true}
@@ -77,7 +76,6 @@ const SignUp = ({ navigation }) => {
         //onPress={() => auth().createUserWithEmailAndPassword(email, password)}
         onPress={() => handleSignUp(email,password)}
       />
-
       <View style={styles.textPrivate}>
         <Text style={styles.color_textPrivate}>By registering, you confirm that you accept our</Text>
         <TouchableOpacity onPress={() => alert('Terms Clicked')}>
@@ -95,6 +93,7 @@ const SignUp = ({ navigation }) => {
         </Text>
       </TouchableOpacity>
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -102,6 +101,7 @@ export default SignUp;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   navButtonText: {
     fontSize: 18,
     fontWeight: '500',
-    color: '#2e64e5',
+    color: COLORS.primary,
     fontFamily: 'Futura',
   },
   textPrivate: {

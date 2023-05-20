@@ -1,13 +1,13 @@
-import React, {useContext, useEffect, useState} from 'react';
+/* eslint-disable react/prop-types */
+/* eslint-disable no-undef */
+import React, { useEffect, useState, useContext} from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   Image,
-  Platform,
   StyleSheet,
-  ScrollView,
-  Alert
+  SafeAreaView,
 } from 'react-native';
 import FormInput from '../app/Components/FormInput';
 import FormButton from '../app/Components/FormButton';
@@ -16,15 +16,20 @@ import { getAuth ,signInWithEmailAndPassword } from "firebase/auth";
 
 import {auth, app} from '../firebase';
 
+import { COLORS } from "../app/constants";
+
+
+import {UserContext} from '../app/Context.js'
+
 
 const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
-
-  //const {login, googleLogin, fbLogin} = useContext(AuthContext);
+  const {userUID, setUserUID} = useContext(UserContext)
+  
 
   useEffect(() =>{
-    const auth = getAuth(app);
+   const auth = getAuth(app);
    const unsubscribe = auth.onAuthStateChanged(user =>{
       if (user){
         navigation.navigate('TabsNav')
@@ -35,19 +40,22 @@ const LoginScreen = ({navigation}) => {
 
   function handleLogIn(){
     auth   
-      signInWithEmailAndPassword(auth,email, password)
+      signInWithEmailAndPassword(auth, email, password)
       .then (userCredentials => {
         const user = userCredentials.user;
+        console.log(user.uid);
         console.log (user.email);
+        setUserUID(user.uid);
         navigation.navigate('TabsNav')
       })
       .catch(error => alert(error.message))
     }
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <View style={styles.container}>
       <Image
-        source={require('../app/Assets/OWIFILogo.webp')}
+        source={require('../app/Assets/logo.png')}
         style={styles.logo}
       />
       <Text style={styles.text}>WIFI Optimal</Text>
@@ -71,11 +79,12 @@ const LoginScreen = ({navigation}) => {
       />
 
       <FormButton
+      
         buttonTitle="Sign In"
         onPress={() => handleLogIn()}
       />
 
-      <TouchableOpacity style={styles.forgotButton} onPress={() => {}}>
+      <TouchableOpacity style={styles.forgotButton} onPress={() =>{}}>
         <Text style={styles.navButtonText}>Forgot Password?</Text>
       </TouchableOpacity>
 
@@ -99,7 +108,7 @@ const LoginScreen = ({navigation}) => {
         </View>
       ) : null} */}
 
-      <TouchableOpacity
+      <TouchableOpacity 
         style={styles.forgotButton}
         onPress={() => navigation.navigate('SignUp')}>
         <Text style={styles.navButtonText}>
@@ -107,6 +116,7 @@ const LoginScreen = ({navigation}) => {
         </Text>
       </TouchableOpacity>
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -141,7 +151,7 @@ const styles = StyleSheet.create({
   navButtonText: {
     fontSize: 18,
     fontWeight: '500',
-    color: '#2e64e5',
+    color: COLORS.primary,
     fontFamily: 'Futura',
   },
 });
