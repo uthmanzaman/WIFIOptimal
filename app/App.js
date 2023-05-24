@@ -75,7 +75,7 @@ const App = () => {
         >
           <AppStack.Screen name="TabsNav" component={TabsNav} />
           <AppStack.Screen name="Login" component={LoginScreen} />
-          <AppStack.Screen name="SignUp" component={SignupScreen} />
+          <AppStack.Screen name="Signup" component={SignupScreen} />
           <AppStack.Screen name="Details" component={Details} />
 
 

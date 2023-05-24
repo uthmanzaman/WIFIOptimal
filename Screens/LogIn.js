@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-undef */
-import React, { useEffect, useState, useContext} from 'react';
+import React, { useEffect, useState, useContext } from "react";
 import {
   View,
   Text,
@@ -8,87 +8,77 @@ import {
   Image,
   StyleSheet,
   SafeAreaView,
-} from 'react-native';
-import FormInput from '../app/Components/FormInput';
-import FormButton from '../app/Components/FormButton';
+} from "react-native";
+import FormInput from "../app/Components/FormInput";
+import FormButton from "../app/Components/FormButton";
 
-import { getAuth ,signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
-import {auth, app} from '../firebase';
+import { auth, app } from "../firebase";
 
 import { COLORS } from "../app/constants";
 
+import { UserContext } from "../app/Context.js";
 
-import {UserContext} from '../app/Context.js'
-
-
-const LoginScreen = ({navigation}) => {
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
-  const {userUID, setUserUID} = useContext(UserContext)
-  
+  const { userUID, setUserUID } = useContext(UserContext);
 
-  useEffect(() =>{
-   const auth = getAuth(app);
-   const unsubscribe = auth.onAuthStateChanged(user =>{
-      if (user){
-        navigation.navigate('TabsNav')
+  useEffect(() => {
+    const auth = getAuth(app);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        navigation.navigate("TabsNav");
       }
-    })
-    return unsubscribe
-  },[])
+    });
+    return unsubscribe;
+  }, []);
 
-  function handleLogIn(){
-    auth   
-      signInWithEmailAndPassword(auth, email, password)
-      .then (userCredentials => {
+  function handleLogIn() {
+    auth;
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredentials) => {
         const user = userCredentials.user;
         console.log(user.uid);
-        console.log (user.email);
+        console.log(user.email);
         setUserUID(user.uid);
-        navigation.navigate('TabsNav')
+        navigation.navigate("TabsNav");
       })
-      .catch(error => alert(error.message))
-    }
+      .catch((error) => alert(error.message));
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-    <View style={styles.container}>
-      <Image
-        source={require('../app/Assets/logo.png')}
-        style={styles.logo}
-      />
-      <Text style={styles.text}>WIFI Optimal</Text>
+      <View style={styles.container}>
+        <Image source={require("../app/Assets/logo.png")} style={styles.logo} />
+        <Text style={styles.text}>WIFI Optimal</Text>
 
-      <FormInput
-        labelValue={email}
-        onChangeText={(userEmail) => setEmail(userEmail)}
-        placeholderText="Email"
-        iconType="user"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
+        <FormInput
+          labelValue={email}
+          onChangeText={(userEmail) => setEmail(userEmail)}
+          placeholderText="Email"
+          iconType="user"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
 
-      <FormInput
-        labelValue={password}
-        onChangeText={(userPassword) => setPassword(userPassword)}
-        placeholderText="Password"
-        iconType="lock"
-        secureTextEntry={true}
-      />
+        <FormInput
+          labelValue={password}
+          onChangeText={(userPassword) => setPassword(userPassword)}
+          placeholderText="Password"
+          iconType="lock"
+          secureTextEntry={true}
+        />
 
-      <FormButton
-      
-        buttonTitle="Sign In"
-        onPress={() => handleLogIn()}
-      />
+        <FormButton buttonTitle="Sign In" onPress={() => handleLogIn()} />
 
-      <TouchableOpacity style={styles.forgotButton} onPress={() =>{}}>
-        <Text style={styles.navButtonText}>Forgot Password?</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.forgotButton} onPress={() => {}}>
+          <Text style={styles.navButtonText}>Forgot Password?</Text>
+        </TouchableOpacity>
 
-      {/* {Platform.OS === 'android' ? (
+        {/* {Platform.OS === 'android' ? (
         <View>
           <SocialButton
             buttonTitle="Sign In with Facebook"
@@ -108,14 +98,15 @@ const LoginScreen = ({navigation}) => {
         </View>
       ) : null} */}
 
-      <TouchableOpacity 
-        style={styles.forgotButton}
-        onPress={() => navigation.navigate('SignUp')}>
-        <Text style={styles.navButtonText}>
-          Don't have an acount? Create here
-        </Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity
+          style={styles.forgotButton}
+          onPress={() => navigation.navigate("SignUp")}
+        >
+          <Text style={styles.navButtonText}>
+            Don't have an acount? Create here
+          </Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -125,22 +116,22 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafd',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#f9fafd",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
-    paddingTop: 50
+    paddingTop: 50,
   },
   logo: {
     height: 150,
     width: 150,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   text: {
-    fontFamily: 'GillSans-Bold',
+    fontFamily: "GillSans-Bold",
     fontSize: 28,
     marginBottom: 10,
-    color: '#051d5f',
+    color: "#051d5f",
   },
   navButton: {
     marginTop: 15,
@@ -150,8 +141,8 @@ const styles = StyleSheet.create({
   },
   navButtonText: {
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: "500",
     color: COLORS.primary,
-    fontFamily: 'Futura',
+    fontFamily: "Futura",
   },
 });

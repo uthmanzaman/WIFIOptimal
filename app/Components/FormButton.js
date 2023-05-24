@@ -3,13 +3,13 @@ import { Text, TouchableOpacity, StyleSheet, Image, Pressable } from "react-nati
 import { windowHeight, windowWidth } from "../utils/Dimensions";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import Animated, {
-  useSharedValue,
-  withSpring,
-  useAnimatedStyle,
-  Extrapolate,
-  interpolate,
-} from "react-native-reanimated";
+// import Animated, {
+//   useSharedValue,
+//   withSpring,
+//   useAnimatedStyle,
+//   Extrapolate,
+//   interpolate,
+// } from "react-native-reanimated";
 
 import { COLORS, SIZES, SHADOWS, assets } from "../constants";
 
@@ -46,42 +46,42 @@ export const CircleButton = ({ imgUrl, handlePress, ...props }) => {
   );
 };
 
-export const LikeButton = () => {
-  const liked = useSharedValue(0);
+// export const LikeButton = () => {
+//   const liked = useSharedValue(0);
 
-  const outlineStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          scale: interpolate(liked.value, [0, 1], [1, 0], Extrapolate.CLAMP),
-        },
-      ],
-    };
-  });
+//   const outlineStyle = useAnimatedStyle(() => {
+//     return {
+//       transform: [
+//         {
+//           scale: interpolate(liked.value, [0, 1], [1, 0], Extrapolate.CLAMP),
+//         },
+//       ],
+//     };
+//   });
 
-  const fillStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: liked.value }],
-      opacity: liked.value,
-    };
-  });
+//   const fillStyle = useAnimatedStyle(() => {
+//     return {
+//       transform: [{ scale: liked.value }],
+//       opacity: liked.value,
+//     };
+//   });
 
-  return (
-    <Pressable onPress={() => (liked.value = withSpring(liked.value ? 0 : 1))}>
-      <Animated.View style={[StyleSheet.absoluteFillObject, outlineStyle]}>
-        <MaterialCommunityIcons
-          name={"heart-outline"}
-          size={32}
-          color={"black"}
-        />
-      </Animated.View>
+//   return (
+//     <Pressable onPress={() => (liked.value = withSpring(liked.value ? 0 : 1))}>
+//       <Animated.View style={[StyleSheet.absoluteFillObject, outlineStyle]}>
+//         <MaterialCommunityIcons
+//           name={"heart-outline"}
+//           size={32}
+//           color={"black"}
+//         />
+//       </Animated.View>
 
-      <Animated.View style={fillStyle}>
-        <MaterialCommunityIcons name={"heart"} size={32} color={"red"} />
-      </Animated.View>
-    </Pressable>
-  );
-};
+//       <Animated.View style={fillStyle}>
+//         <MaterialCommunityIcons name={"heart"} size={32} color={"red"} />
+//       </Animated.View>
+//     </Pressable>
+//   );
+// };
 
 export default FormButton;
 

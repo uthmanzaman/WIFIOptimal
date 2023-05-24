@@ -21,8 +21,10 @@ import XMLParser from "react-xml-parser";
 import NetInfo from "@react-native-community/netinfo";
 import wifi from "react-native-wifi-reborn";
 import axios from "axios";
+//import wifi from 'react-native-wifi';
 
 import { scanWifiNetworks } from "../app/Components/WIFIList";
+import LocationStrength from "../app/Components/locationStrength";
 
 const DevicesPage = () => {
   const [netInfoObject, setNetInfoObject] = useState({ deviceName: "" });
@@ -41,7 +43,9 @@ const DevicesPage = () => {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
 
-  const [scanResults, setScanResults] = useState([{}]);
+  const [scanResults, setScanResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isScanComplete, setIsScanComplete] = useState(false);
 
   const getAllDevices = () => {
     requestLocationPersmission();
@@ -63,15 +67,55 @@ const DevicesPage = () => {
       );
       const UID = new URL(headers.USN);
       if (UID != null) {
-        // setDeviceList((currentDeviceList) => [
-        //   [...currentDeviceList, UID],
-        //   { text: deviceList, key: Math.round().toString() },
-        // ]);
-        //console.log(deviceList);
-        //setDeviceData(deviceList)
-        //console.log(output)
+        setDeviceList((currentDeviceList) => [
+          [...currentDeviceList, UID],
+          { text: deviceList, key: Math.round().toString() },
+        ]);
+        console.log(deviceList);
       }
     });
+  };
+
+  const renderScanResult = ({ item }) => {
+    const signalStrengthCategory = getSignalStrengthCategory(item.level);
+    const rssi = calculateRSSI(item.level);
+
+    return (
+      <View style={[styles.resultContainer, styles[signalStrengthCategory]]}>
+       <Text style={styles.networkName}>
+          {" "}
+            {item.BSSID ? ` BSSID : ${item.BSSID}` : " "}
+          </Text>
+          <Text style={styles.signalStrength}>
+          {" "}
+            {item.level
+              ? ` Signal strength :  ${item.level} dBm`
+              : " "}
+          </Text>
+          <Text style={{ color: "green", fontWeight: "bold" }}>
+          {" "}
+            {getSignalStrengthCategory(item.level)
+              ? ` Signal Strength Category: ${getSignalStrengthCategory(
+                  item.level
+                )}`
+              : " "}
+          </Text>
+          <Text>{item.SSID ? ` SSID : ${item.SSID}` : " "}</Text>
+          <Text style={styles.rssi}>
+          {" "}
+            {item.frequency
+              ? ` Frequency : ${item.frequency} MHz`
+              : " "}
+          </Text>
+        <View style={{ backgroundColor: "yellow" }}>
+        <Text style={styles.header}>Devices information:</Text>
+        <Text>
+          {deviceList.as ? `ISP : ${deviceList.as}` : " "} {deviceList.ip ? `IP : ${deviceList.ip}` : " "} {deviceList.country ? `Country : ${deviceList.country}` : " "} - City:{" "}
+          {deviceList.city}
+        </Text>
+      </View>
+      </View>
+    );
   };
 
   const scanNetwork = async () => {
@@ -91,6 +135,12 @@ const DevicesPage = () => {
     }
     console.log(devices);
   };
+
+  /**
+   * Retrieves a list of available wifi networks and sets the wifiListObject state with the first entry.
+   *
+   * @return {Promise<void>} A Promise that resolves with no value.
+   */
 
   const list = async () => {
     let wifiList = await wifi.loadWifiList(); //wifiList will be Array<WifiEntry>
@@ -124,6 +174,7 @@ const DevicesPage = () => {
       console.log("Location Permission Denied");
     }
   };
+
   function getWifiName() {
     WifiManager.getCurrentWifiSSID().then(
       (ssid) => {
@@ -143,7 +194,7 @@ const DevicesPage = () => {
 
     return (
       <FlatList
-        data={deviceList.USN}
+        data={deviceList}
         renderItem={(itemData) => {
           return (
             <TouchableOpacity style={styles.listItem}>
@@ -272,7 +323,7 @@ const DevicesPage = () => {
       const response = await axios.get(`http://ip-api.com/json/${ipA}`);
       //console.log("Response:", response.data);
       setDeviceList(response.data);
-      console.log([deviceList]);
+      //console.log([deviceList]);
       // Process the response data as needed
     } catch (error) {
       console.error("Error:", error);
@@ -280,12 +331,27 @@ const DevicesPage = () => {
   };
 
   const handleScanButtonPress = async () => {
-    //const results = await scanWifiNetworks();
-    let results = await wifi.loadWifiList();
-    setScanResults(results[0]);
-    //console.log([scanResults]);
-    fetchData();
+    setIsLoading(true);
+    try {
+      let results = await wifi.loadWifiList();
+      //setScanResults(results[0]);
+      //console.log([scanResults]);
+      if (results && results.length > 0) {
+        setScanResults(results);
+        console.log(scanResults);
+      } else {
+        setScanResults([]);
+      }
+      setIsScanComplete(true);
+    } catch (error) {
+      console.error("Error scanning Wi-Fi networks:", error);
+      setScanResults([]);
+      setIsScanComplete(true);
+    }
+    setIsLoading(false);
   };
+
+  //fetchData();
 
   const calculateRSSI = (level) => {
     const rssi = 100 + level;
@@ -294,6 +360,8 @@ const DevicesPage = () => {
 
   const getSignalStrengthCategory = (level) => {
     const rssi = calculateRSSI(level);
+    //const category = getSignalStrengthCategory(level);
+
 
     if (rssi >= -50) {
       return "Excellent";
@@ -306,11 +374,43 @@ const DevicesPage = () => {
     }
   };
 
+  // const getSignalStrengthStyle = (level) => {
+  //   const category = getSignalStrengthCategory(level);
+
+  //   switch (category) {
+  //     case 'excellent':
+  //       return styles.excellent;
+  //     case 'good':
+  //       return styles.good;
+  //     case 'fair':
+  //       return styles.fair;
+  //     case 'weak':
+  //       return styles.weak;
+  //     default:
+  //       return styles.default;
+  //   }
+  // };
+
+  // const renderItem = ({ item }) => {
+  //   const signalStrengthCategory = getSignalStrengthCategory(item.level);
+  //   const rssi = calculateRSSI(item.level);
+
+  //   return (
+  //     <View style={[styles.resultContainer, styles[signalStrengthCategory]]}>
+  //       <Text style={styles.networkName}>{item.BSSID}</Text>
+  //       <Text style={styles.signalStrength}>Signal Strength : {item.level}</Text>
+  //       <Text style={styles.rssi}>RSSI: {rssi}</Text>
+  //       {/* Render other relevant scan result information */}
+  //     </View>
+  //   );
+  // };
+
   useEffect(() => {
     // Displays netinfoobject information when devices page is loaded up
     // getNetInfo();
     // getIp();
-    //fetchData();
+    //handleScanButtonPress();
+    fetchData();
     // const fetchIpAddresses = async () => {
     //   const scanResults = await scanWifiNetworks();
     //   setIpAddresses(scanResults);
@@ -328,8 +428,9 @@ const DevicesPage = () => {
             {" "}
             {wifiName ? `Wi-Fi Network : ${wifiName} ` : " "}
           </Text>
+          <LocationStrength/>
+
         </View>
-        <DataView />
 
         <View
           style={{
@@ -344,6 +445,7 @@ const DevicesPage = () => {
           <View style={{ height: 200, backgroundColor: COLORS.primary }} />
           {/* <View style={{ flex: 1, backgroundColor: COLORS.white }} /> */}
         </View>
+        
 
         <Modal visible={showModal} transparent={true}>
           <View style={styles.modalStyle}>
@@ -377,19 +479,25 @@ const DevicesPage = () => {
             Scan Network
           </Text>
         </TouchableOpacity>
+        
       </View>
+      
       <View>
+        {/* <View style={[styles.resultContainer, getSignalStrengthStyle(scanResults.level)]}>
         <Text style={styles.header}>Wi-Fi Scan Results</Text>
         <View>
           <Text>
+          {" "}
             {scanResults.BSSID ? ` BSSID : ${scanResults.BSSID}` : " "}
           </Text>
-          <Text>
+          <Text style={styles.signalStrength}>
+          {" "}
             {scanResults.level
               ? ` Signal strength :  ${scanResults.level} dBm`
               : " "}
           </Text>
           <Text style={{ color: "green", fontWeight: "bold" }}>
+          {" "}
             {getSignalStrengthCategory(scanResults.level)
               ? ` Signal Strength Category: ${getSignalStrengthCategory(
                   scanResults.level
@@ -398,18 +506,35 @@ const DevicesPage = () => {
           </Text>
           <Text>{scanResults.SSID ? ` SSID : ${scanResults.SSID}` : " "}</Text>
           <Text>
+          {" "}
             {scanResults.frequency
               ? ` Frequency : ${scanResults.frequency} MHz`
               : " "}{" "}
           </Text>
         </View>
-      </View>
-      <View styles={{ backgroundColor: "red" }}>
+        <View styles={{ backgroundColor: "red" }}>
         <Text style={styles.header}>Devices information:</Text>
         <Text>
-          ISP: {deviceList.as} - Country: {deviceList.country} - City:{" "}
+          {deviceList.as ? `ISP : ${deviceList.as}` : " "} {deviceList.ip ? `IP : ${deviceList.ip}` : " "} {deviceList.country ? `Country : ${deviceList.country}` : " "} - City:{" "}
           {deviceList.city}
         </Text>
+      </View> */}
+        <Text style={styles.title}>Wi-Fi Scan Results</Text>
+        
+
+        {isLoading ? (
+          <Text>Loading...</Text>
+        ) : isScanComplete ? (
+          scanResults.length > 0 ? (
+            <FlatList
+              data={scanResults}
+              renderItem={renderScanResult}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          ) : (
+            <Text>No scan results available</Text>
+          )
+        ) : null}
       </View>
     </SafeAreaView>
   );
@@ -420,6 +545,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#2A2A2A",
   },
   header: {
     paddingVertical: 20,
@@ -481,14 +612,39 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: "center",
   },
-  modalStyle2: {
-    width: "90%",
-    flex: 0.7,
-    backgroundColor: COLORS.primary,
-    margin: 20,
-    marginTop: 150,
-    borderRadius: 20,
-    justifyContent: "center",
+  resultContainer: {
+    backgroundColor: "white",
+    marginBottom: 10,
+    padding: 20,
+    borderRadius: 10,
+    elevation: 2,
+  },
+  excellent: {
+    backgroundColor: "green",
+  },
+  good: {
+    backgroundColor: "yellow",
+  },
+  fair: {
+    backgroundColor: "orange",
+  },
+  weak: {
+    backgroundColor: "red",
+  },
+  default: {
+    backgroundColor: "white",
+  },
+  networkName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#2A2A2A',
+  },
+  signalStrength: {
+    fontSize: 14,
+  },
+  rssi: {
+    fontSize: 14,
   },
 });
 

@@ -10,6 +10,8 @@ import { CircleButton, LikeButton } from "./FormButton";
 export const FAQCard = ({ data, onPress }) => {
   const navigation = useNavigation();
   //console.log(data)
+  const lines = data.description.split("\n");
+
 
   return (
     <TouchableOpacity
@@ -47,7 +49,6 @@ export const FAQCard = ({ data, onPress }) => {
       <View style={{ width: "100%", padding: SIZES.font }}>
         <FAQTitle
           title={data.name}
-          subTitle={data.description}
           titleSize={SIZES.large}
           subTitleSize={SIZES.small}
         />

@@ -56,11 +56,11 @@ const HomeHeader = ({ onSearch }) => {
             paddingVertical: SIZES.small - 2,
           }}
         >
-          <TextInput
+          {/* <TextInput
             placeholder="Search Suggestions"
             style={{ flex: 1 }}
             onChangeText={onSearch}
-          />
+          /> */}
         </View>
       </View>
     </View>

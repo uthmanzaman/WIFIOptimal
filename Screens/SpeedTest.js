@@ -13,6 +13,9 @@ import {
 // import { EventRegister } from 'react-native-event-listeners'
 // import { emitConfig } from '../app/Components/connectionSpeed';
 
+import Ping from '../app/Components/ping';
+
+
 import RNFetchBlob from "rn-fetch-blob";
 
 import { db } from "../firebase.js";
@@ -25,19 +28,26 @@ import {
   orderBy,
   where,
 } from "firebase/firestore";
-import { wifiName } from "./DevicesPage";
+import { getWifiName } from "./DevicesPage";
 import { UserContext } from "../app/Context.js";
+import WifiManager from "react-native-wifi-reborn";
+
 
 import { COLORS } from "../app/constants";
 import { FocusedStatusBar } from "../app/Components";
+
+
 
 function SpeedTest() {
   const [sTest, setTest] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [speedData, setSpeedData] = useState([{}]);
+  const [wifiName2, SetWifiName2] = useState([]);
+
   let speedDataObject = [{}];
 
   const { userUID } = useContext(UserContext);
+
 
   const downloadSizeInBits = 12000000;
   const metric = "MBps";
@@ -63,6 +73,10 @@ function SpeedTest() {
         .catch(reject);
     });
   };
+
+  
+
+
 
   function DataView() {
     return (
@@ -147,6 +161,18 @@ function SpeedTest() {
     );
   }
 
+  function getWifiName() {
+    WifiManager.getCurrentWifiSSID().then(
+      (ssid) => {
+        //console.log("Your current connected wifi SSID is " + ssid);
+        SetWifiName2(ssid);
+      },
+      () => {
+        console.log("Cannot get current SSID!");
+      }
+    );
+  }
+
   const getNetworkBandwidth = async (): Promise<void> => {
     //logs download speed (object)
     try {
@@ -185,6 +211,8 @@ function SpeedTest() {
     } catch (err) {
       console.log(err);
     }
+
+    getWifiName();
   };
 
   return (
@@ -196,11 +224,15 @@ function SpeedTest() {
         <View style={{ zIndex: 0 }}>
           <Text style={styles.headerText}>
             {" "}
-            {wifiName ? `Wi-Fi Network : ${wifiName.ssid} ` : " "}
+            
+            {wifiName2 ? `Wi-Fi Network : ${wifiName2} ` : " "} 
           </Text>
+
         </View>
         </View>
         <View style={styles.content}>
+        <Ping/>
+
           <TouchableOpacity
             style={styles.button}
             onPress={() => getNetworkBandwidth()}
@@ -263,6 +295,8 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 20,
     fontWeight: "bold",
+    color: "#fff",
+
   },
   content: {
     flex: 1,

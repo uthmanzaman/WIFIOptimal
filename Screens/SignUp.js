@@ -12,7 +12,7 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { COLORS } from "../app/constants";
 
 
-const SignUp = ({ navigation }) => {
+ const SignupScreen = ({ navigation }) => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -97,7 +97,7 @@ const SignUp = ({ navigation }) => {
   );
 };
 
-export default SignUp;
+export default SignupScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -135,3 +135,4 @@ const styles = StyleSheet.create({
     color: 'grey',
   },
 });
+
