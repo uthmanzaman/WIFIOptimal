@@ -1,18 +1,13 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import { View, Image, TouchableOpacity } from "react-native";
 
 import { COLORS, SIZES, SHADOWS, assets } from "../constants";
 import { SubInfo, FAQTitle } from "./subInfo";
-import { CircleButton, LikeButton } from "./FormButton";
 
 
 export const FAQCard = ({ data, onPress }) => {
-  const navigation = useNavigation();
-  //console.log(data)
-  const lines = data.description.split("\n");
-
-
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -43,16 +38,13 @@ export const FAQCard = ({ data, onPress }) => {
           }}
         />
       </View>
-
       <SubInfo />
-
       <View style={{ width: "100%", padding: SIZES.font }}>
         <FAQTitle
           title={data.name}
           titleSize={SIZES.large}
           subTitleSize={SIZES.small}
         />
-
         <View
           style={{
             marginTop: SIZES.font,
@@ -62,16 +54,9 @@ export const FAQCard = ({ data, onPress }) => {
             textAlignVertical: "top",
           }}
         >
-          {/* <LikeButton right={1000} top={1000} /> */}
-          {/* <TouchableOpacity
-            minWidth={120}
-            fontSize={SIZES.font}
-            handlePress={() => navigation.navigate("Details", { data })}
-          /> */}
         </View>
       </View>
     </TouchableOpacity>
   );
 };
-
 export default FAQCard;

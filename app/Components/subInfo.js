@@ -3,7 +3,7 @@ import { View, Image, Text } from "react-native";
 
 import { SIZES, FONTS, COLORS, SHADOWS, assets } from "../constants";
 
-export const FAQTitle = ({ title, subTitle, titleSize, subTitleSize }) => {
+export const FAQTitle = ({ title, titleSize,  }) => {
   return (
     <View>
       <Text
@@ -15,15 +15,6 @@ export const FAQTitle = ({ title, subTitle, titleSize, subTitleSize }) => {
       >
         {title}
       </Text>
-      {/* <Text
-        style={{
-          fontFamily: FONTS.regular,
-          fontSize: subTitleSize,
-          color: COLORS.primary,
-        }}
-      >
-        by {subTitle}
-      </Text> */}
     </View>
   );
 };

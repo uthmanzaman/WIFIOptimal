@@ -37,31 +37,10 @@ const HomeHeader = ({ onSearch }) => {
               marginTop: SIZES.base / 2,
             }}
           >
-            Read these too improve your network
+            Read these too improve your networks performance
           </Text>
         </View>
 
-        <View style={{ width: 45, height: 45 }}></View>
-      </View>
-
-      <View style={{ marginTop: SIZES.font }}>
-        <View
-          style={{
-            width: "100%",
-            borderRadius: SIZES.font,
-            backgroundColor: COLORS.gray,
-            flexDirection: "row",
-            alignItems: "center",
-            paddingHorizontal: SIZES.font,
-            paddingVertical: SIZES.small - 2,
-          }}
-        >
-          {/* <TextInput
-            placeholder="Search Suggestions"
-            style={{ flex: 1 }}
-            onChangeText={onSearch}
-          /> */}
-        </View>
       </View>
     </View>
   );

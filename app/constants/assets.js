@@ -1,7 +1,6 @@
 
 
 import left from "../Assets/left.png";
-
 import qos from "../Assets/qos.png";
 import logo from "../Assets/logo.png";
 

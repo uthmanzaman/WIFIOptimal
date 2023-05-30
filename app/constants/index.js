@@ -1,6 +1,6 @@
 
 import { COLORS, SHADOWS, SIZES, FONTS } from "./theme";
-import { faqData } from "./dummy";
+import { faqData } from "./faqData";
 import assets from "./assets";
 
 

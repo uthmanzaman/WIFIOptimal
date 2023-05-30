@@ -7,24 +7,24 @@ import {
   TouchableOpacity,
   PermissionsAndroid,
   FlatList,
-  ScrollView,
   SafeAreaView,
+  ActivityIndicator,
+  ScrollView,
+  Alert,
 } from "react-native";
 
 import { COLORS } from "../app/constants";
 import { FocusedStatusBar } from "../app/Components";
 
 import * as Device from "expo-device";
-import * as Network from "expo-network";
 import WifiManager from "react-native-wifi-reborn";
-import XMLParser from "react-xml-parser";
 import NetInfo from "@react-native-community/netinfo";
 import wifi from "react-native-wifi-reborn";
 import axios from "axios";
-//import wifi from 'react-native-wifi';
 
 import { scanWifiNetworks } from "../app/Components/WIFIList";
 import LocationStrength from "../app/Components/locationStrength";
+import DistanceLocation from "../app/Components/distanceLocation";
 
 const DevicesPage = () => {
   const [netInfoObject, setNetInfoObject] = useState({ deviceName: "" });
@@ -82,38 +82,45 @@ const DevicesPage = () => {
 
     return (
       <View style={[styles.resultContainer, styles[signalStrengthCategory]]}>
-       <Text style={styles.networkName}>
+        <Text style={styles.networkName}>
           {" "}
-            {item.BSSID ? ` BSSID : ${item.BSSID}` : " "}
-          </Text>
-          <Text style={styles.signalStrength}>
-          {" "}
-            {item.level
-              ? ` Signal strength :  ${item.level} dBm`
-              : " "}
-          </Text>
-          <Text style={{ color: "green", fontWeight: "bold" }}>
-          {" "}
-            {getSignalStrengthCategory(item.level)
-              ? ` Signal Strength Category: ${getSignalStrengthCategory(
-                  item.level
-                )}`
-              : " "}
-          </Text>
-          <Text>{item.SSID ? ` SSID : ${item.SSID}` : " "}</Text>
-          <Text style={styles.rssi}>
-          {" "}
-            {item.frequency
-              ? ` Frequency : ${item.frequency} MHz`
-              : " "}
-          </Text>
-        <View style={{ backgroundColor: "yellow" }}>
-        <Text style={styles.header}>Devices information:</Text>
-        <Text>
-          {deviceList.as ? `ISP : ${deviceList.as}` : " "} {deviceList.ip ? `IP : ${deviceList.ip}` : " "} {deviceList.country ? `Country : ${deviceList.country}` : " "} - City:{" "}
-          {deviceList.city}
+          {item.SSID ? `SSID : ${item.SSID}` : " "}
         </Text>
-      </View>
+        <Text style={styles.signalStrength}>
+          {" "}
+          {item.BSSID ? `BSSID : ${item.BSSID}` : " "}
+        </Text>
+        <Text style={styles.signalStrength}>
+          {" "}
+          {item.level ? `Signal strength :  ${item.level} dBm` : " "}
+        </Text>
+        <Text style={{ color: "green", fontWeight: "bold" }}>
+          {" "}
+          {getSignalStrengthCategory(item.level)
+            ? `Signal Strength Category: ${getSignalStrengthCategory(
+                item.level
+              )}`
+            : " "}
+        </Text>
+        <Text>{item.SSID ? ` SSID : ${item.SSID}` : " "}</Text>
+        <Text style={styles.rssi}>
+          {" "}
+          {item.frequency ? `Frequency : ${item.frequency} MHz` : " "}
+        </Text>
+        <View
+          style={{
+            backgroundColor: "yellow",
+            borderColor: "black",
+            borderWidth: 1,
+          }}
+        >
+          <Text style={styles.header}>Location information:</Text>
+          <Text>{deviceList.as ? `ISP : ${deviceList.as}` : " "} </Text>
+          <Text>
+            {deviceList.country ? `Country : ${deviceList.country}` : " "}
+          </Text>
+          <Text>City: {deviceList.city}</Text>
+        </View>
       </View>
     );
   };
@@ -193,12 +200,8 @@ const DevicesPage = () => {
     //console.log(ipA)
 
     return (
-      <FlatList
-        data={deviceList}
-        renderItem={(itemData) => {
-          return (
-            <TouchableOpacity style={styles.listItem}>
-              {itemData.item.content} onPress={() => setShowModal(true)}
+            <TouchableOpacity style={styles.listItem}
+               onPress={() => setShowModal(true)}>
               <View>
                 <Text style={styles.dataViewText}>
                   {" "}
@@ -206,17 +209,18 @@ const DevicesPage = () => {
                 </Text>
                 <Text style={styles.dataViewText}> OS: {Device.osName}</Text>
                 <Text style={styles.dataViewText}> IP add: {ipA}</Text>
-                <Text style={styles.header}>
-                  Strength: {netInfoObject.strength}
-                  {" dBm"}
-                </Text>
+                
+                  {/* Strength: {netInfoObject.strength}
+                  {" dBm"} */}
+                
               </View>
             </TouchableOpacity>
           );
-        }}
-      />
-    );
-  }
+        }
+      
+      
+      
+    
 
   function ModalDataView() {
     // Data view of netinforobject which goes into connected devices Modal
@@ -244,16 +248,6 @@ const DevicesPage = () => {
         </Text>
         <Text style={styles.dataViewText}> Subnet: {netInfoObject.subnet}</Text>
         <Text style={styles.dataViewText}>
-          <Text style={styles.header}>Strength:</Text> {netInfoObject.strength}
-          {" dBm"}
-        </Text>
-        <Text style={styles.dataViewText}>
-          <Text style={styles.header}>
-            Frequency: {netInfoObject.frequency}
-            {" MHz"}
-          </Text>
-        </Text>
-        <Text style={styles.dataViewText}>
           <Text style={styles.header}>
             Link Speed: {netInfoObject.linkSpeed}
           </Text>
@@ -276,8 +270,6 @@ const DevicesPage = () => {
       dType: "",
       modelName: "",
       macAddress: "",
-      Strength: "",
-      frequency: "",
       subnet: "",
       linkSpeed: "",
       rxLinkSpeed: "",
@@ -331,24 +323,29 @@ const DevicesPage = () => {
   };
 
   const handleScanButtonPress = async () => {
-    setIsLoading(true);
-    try {
-      let results = await wifi.loadWifiList();
-      //setScanResults(results[0]);
-      //console.log([scanResults]);
-      if (results && results.length > 0) {
-        setScanResults(results);
-        console.log(scanResults);
-      } else {
+    NetInfo.fetch().then((connectionInfo) => {
+      if (connectionInfo.type === "wifi") {
+        setIsLoading(true);
         setScanResults([]);
+        setIsScanComplete(false);
+        try {
+          setTimeout(async () => {
+            let results = await wifi.loadWifiList();
+            setScanResults(results);
+            setIsScanComplete(true);
+            setIsLoading(false);
+          }, 3000);
+        } catch (error) {
+          console.error("Error scanning Wi-Fi networks:", error);
+          setScanResults([]);
+          setIsScanComplete(true);
+          setIsLoading(false);
+        }
+      } else {
+        Alert.alert("Warning", "You are not connected to a Wi-Fi network");
+        return;
       }
-      setIsScanComplete(true);
-    } catch (error) {
-      console.error("Error scanning Wi-Fi networks:", error);
-      setScanResults([]);
-      setIsScanComplete(true);
-    }
-    setIsLoading(false);
+    });
   };
 
   //fetchData();
@@ -361,7 +358,6 @@ const DevicesPage = () => {
   const getSignalStrengthCategory = (level) => {
     const rssi = calculateRSSI(level);
     //const category = getSignalStrengthCategory(level);
-
 
     if (rssi >= -50) {
       return "Excellent";
@@ -407,7 +403,7 @@ const DevicesPage = () => {
 
   useEffect(() => {
     // Displays netinfoobject information when devices page is loaded up
-    // getNetInfo();
+    getNetInfo();
     // getIp();
     //handleScanButtonPress();
     fetchData();
@@ -428,7 +424,7 @@ const DevicesPage = () => {
             {" "}
             {wifiName ? `Wi-Fi Network : ${wifiName} ` : " "}
           </Text>
-          <LocationStrength/>
+          <DataView/>
 
         </View>
 
@@ -442,10 +438,12 @@ const DevicesPage = () => {
             zIndex: -1,
           }}
         >
+          
           <View style={{ height: 200, backgroundColor: COLORS.primary }} />
+
           {/* <View style={{ flex: 1, backgroundColor: COLORS.white }} /> */}
+
         </View>
-        
 
         <Modal visible={showModal} transparent={true}>
           <View style={styles.modalStyle}>
@@ -461,80 +459,37 @@ const DevicesPage = () => {
           </View>
         </Modal>
       </View>
-      <View
-        style={{
-          alignItems: "center",
-          position: "absolute",
-          bottom: 505,
-          zIndex: 0,
-          left: 140,
-        }}
-      >
-        <TouchableOpacity
-          title="scan"
-          style={styles.button}
-          onPress={handleScanButtonPress}
-        >
+      
+      
+      <View style={{ flex: 1, backgroundColor: "white", justifyContent: 'center', alignItems: 'center' }}>
+        {/* <View style={styles.buttonContainer}> */}
+        <TouchableOpacity style={styles.button} onPress={handleScanButtonPress}>
           <Text style={styles.buttonText} value={input}>
             Scan Network
           </Text>
         </TouchableOpacity>
-        
+        <LocationStrength />
+        <DistanceLocation />
       </View>
       
+
       <View>
-        {/* <View style={[styles.resultContainer, getSignalStrengthStyle(scanResults.level)]}>
-        <Text style={styles.header}>Wi-Fi Scan Results</Text>
-        <View>
-          <Text>
-          {" "}
-            {scanResults.BSSID ? ` BSSID : ${scanResults.BSSID}` : " "}
-          </Text>
-          <Text style={styles.signalStrength}>
-          {" "}
-            {scanResults.level
-              ? ` Signal strength :  ${scanResults.level} dBm`
-              : " "}
-          </Text>
-          <Text style={{ color: "green", fontWeight: "bold" }}>
-          {" "}
-            {getSignalStrengthCategory(scanResults.level)
-              ? ` Signal Strength Category: ${getSignalStrengthCategory(
-                  scanResults.level
-                )}`
-              : " "}
-          </Text>
-          <Text>{scanResults.SSID ? ` SSID : ${scanResults.SSID}` : " "}</Text>
-          <Text>
-          {" "}
-            {scanResults.frequency
-              ? ` Frequency : ${scanResults.frequency} MHz`
-              : " "}{" "}
-          </Text>
-        </View>
-        <View styles={{ backgroundColor: "red" }}>
-        <Text style={styles.header}>Devices information:</Text>
-        <Text>
-          {deviceList.as ? `ISP : ${deviceList.as}` : " "} {deviceList.ip ? `IP : ${deviceList.ip}` : " "} {deviceList.country ? `Country : ${deviceList.country}` : " "} - City:{" "}
-          {deviceList.city}
-        </Text>
-      </View> */}
         <Text style={styles.title}>Wi-Fi Scan Results</Text>
-        
 
         {isLoading ? (
-          <Text>Loading...</Text>
-        ) : isScanComplete ? (
-          scanResults.length > 0 ? (
-            <FlatList
-              data={scanResults}
-              renderItem={renderScanResult}
-              keyExtractor={(item, index) => index.toString()}
-            />
-          ) : (
-            <Text>No scan results available</Text>
-          )
-        ) : null}
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#000000" />
+            <Text style={styles.loadingText}>Loading...</Text>
+          </View>
+        ) : scanResults.length > 0 ? (
+          <FlatList
+            data={scanResults}
+            renderItem={renderScanResult}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        ) : (
+          <Text>No scan results available</Text>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -571,7 +526,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
-    width: 130,
+    width: 160,
     height: 50,
     marginTop: 10,
     marginBottom: 10,
@@ -579,19 +534,26 @@ const styles = StyleSheet.create({
     backgroundColor: "#007AFF",
     alignItems: "center",
     justifyContent: "center",
+    marginHorizontal: 5,
   },
   buttonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "green",
   },
   listItem: {
     flex: 1,
     padding: 20,
     marginTop: 10,
     borderWidth: 1,
-    borderColor: "",
-    backgroundColor: "#007AFF",
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.white,
     width: "90%",
     borderRadius: 15,
     justifyContent: "center",
@@ -636,15 +598,22 @@ const styles = StyleSheet.create({
   },
   networkName: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
-    color: '#2A2A2A',
+    color: "#2A2A2A",
   },
   signalStrength: {
     fontSize: 14,
   },
   rssi: {
     fontSize: 14,
+  },
+  loadingContainer: {
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 18,
+    marginTop: 10,
   },
 });
 

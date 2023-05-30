@@ -8,12 +8,18 @@ import {
   Modal,
   FlatList,
   SafeAreaView,
+  Alert,
+  ActivityIndicator
 } from "react-native";
 // import ConnectionSpeed from '../app/Components/connectionSpeed';
 // import { EventRegister } from 'react-native-event-listeners'
 // import { emitConfig } from '../app/Components/connectionSpeed';
 
 import Ping from '../app/Components/ping';
+import firebase from 'firebase/app';
+import { getStorage, ref, uploadBytes } from "firebase/storage";
+
+
 
 
 import RNFetchBlob from "rn-fetch-blob";
@@ -27,6 +33,7 @@ import {
   query,
   orderBy,
   where,
+  firestore,
 } from "firebase/firestore";
 import { getWifiName } from "./DevicesPage";
 import { UserContext } from "../app/Context.js";
@@ -40,6 +47,11 @@ import { FocusedStatusBar } from "../app/Components";
 
 function SpeedTest() {
   const [sTest, setTest] = useState(0);
+  const [UploadTest, setUploadTest] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+
+
   const [showModal, setShowModal] = useState(false);
   const [speedData, setSpeedData] = useState([{}]);
   const [wifiName2, SetWifiName2] = useState([]);
@@ -51,11 +63,12 @@ function SpeedTest() {
 
   const downloadSizeInBits = 12000000;
   const metric = "MBps";
-  const measureConnectionSpeed = (imageURIParam: string): string => {
+  const measureConnectionSpeed = (fileURIParam: string): string => {
+    setIsLoading(true);
     // Holds the functionality of the speed test
-    const imageURI = imageURIParam
-      ? imageURIParam
-      : "https://drive.google.com/file/d/1uMBtds_ooFmfkrn1JcUl0UZjh-oi3k9g/view?usp=sharing";
+    const imageURI = fileURIParam
+      ? fileURIParam
+      : "https://drive.google.com/file/d/1DyxBp7u7TJkvNKkPWA3iUU4Pdkp4-8Nx/view?usp=share_link";
     return new Promise((resolve, reject) => {
       const startTime = new Date().getTime(); // Starts the time when file starts downloading
       RNFetchBlob.config({
@@ -74,6 +87,34 @@ function SpeedTest() {
     });
   };
 
+
+  const uploadSpeedTest = async () => {
+    setIsLoading(true);
+
+    const fileUri = "/Downloads/SolsticeClient"; // Path to the file being uploaded
+
+    const storage = getStorage();
+    const fileRef = ref(storage, `TestData/${fileUri}`);
+
+    // Upload speed test
+    const uploadStartTime = new Date();
+    try {
+      uploadBytes(fileRef,fileUri).then(() => {
+        //Alert.alert("File uploaded successfully");
+      })
+      const uploadEndTime = new Date();
+      const uploadDuration = (uploadEndTime - uploadStartTime) / 1000;
+
+      const uploadFileSize = 70; // In MB (according to the size of the uploaded file)
+      const uploadSpeedValue = (uploadFileSize / uploadDuration).toFixed(2); // Upload speed in Mbps
+
+      setUploadTest(uploadSpeedValue);
+    } catch (error) {
+      console.error('Upload failed:', error);
+    }
+    getNetworkBandwidth();
+
+  };
   
 
 
@@ -151,6 +192,9 @@ function SpeedTest() {
                     <Text style={{ color: "white", fontWeight: "bold" }}>
                       {item?.downloadSpeed} MB/s
                     </Text>
+                    <Text style={{ color: "white", fontWeight: "bold" }}>
+                      {item?.uploadSpeed} MB/s
+                    </Text>
                   </View>
                 )}
               />
@@ -174,7 +218,7 @@ function SpeedTest() {
   }
 
   const getNetworkBandwidth = async (): Promise<void> => {
-    //logs download speed (object)
+
     try {
       ///*global NetworkBandwidthTestResults*/
       await measureConnectionSpeed(); // Waits for speed test to finish
@@ -183,6 +227,7 @@ function SpeedTest() {
           addDoc(collection(db, "speedTestData"), {
             // Adds data to firebase, creating a new collection
             downloadSpeed: Number(sTest.toFixed(2)),
+            uploadSpeed: Number(UploadTest),
             createdAt: Timestamp.fromDate(new Date()),
             userUID: userUID, // User ID is set to each test
           });
@@ -211,6 +256,8 @@ function SpeedTest() {
     } catch (err) {
       console.log(err);
     }
+    setIsLoading(false);
+
 
     getWifiName();
   };
@@ -233,30 +280,40 @@ function SpeedTest() {
         <View style={styles.content}>
         <Ping/>
 
+
           <TouchableOpacity
             style={styles.button}
-            onPress={() => getNetworkBandwidth()}
+            onPress={() =>  uploadSpeedTest()}
           >
             <Text style={styles.buttonText}>Start</Text>
           </TouchableOpacity>
-          <View style={styles.output}>
-            <View style={{ flex: 0.5 }}>
-              <Text style={styles.outputText}>
-                {sTest
-                  ? `Download speed: ${Math.round(sTest * 100) / 100} `
-                  : " "}
-                MB/s
-              </Text>
-            </View>
-            <View style={{ flex: 0.5 }}>
-              <Text style={styles.outputText}>
-                {sTest
-                  ? `Upload speed:  ${Math.round(sTest * 100) / 100} `
-                  : " "}
-                MB/s
-              </Text>
-            </View>
+          <View style={styles.box}>
+
+          
+          {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#000000" />
+            <Text style={styles.loadingText}>Loading...</Text>
           </View>
+        ) : (
+          <>
+  
+              <Text style={styles.outputText}>
+                {sTest
+                  ? `Download speed: ${Math.round(sTest * 100) / 100}`
+                  : " "}
+                MB/s
+              </Text>
+              <Text style={styles.outputText}>
+                {sTest
+                  ? `Upload speed: ${Math.round(UploadTest * 100) / 100}`
+                  : " "}
+                MB/s
+              </Text>
+            </>
+            )}
+
+            </View>
 
           <DataView />
           {showModal && <ModalData />}
@@ -296,7 +353,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "#fff",
-
+  },
+  box: {
+    width: 300,
+    padding: 20,
+    borderWidth: 2,
+    borderColor: "black",
+    borderRadius: 10,
+    backgroundColor: "white",
+    alignItems: "center",
+    marginBottom: 100,
   },
   content: {
     flex: 1,
@@ -305,9 +371,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
-    width: 200,
-    height: 200,
+    width: 150,
+    height: 150,
     padding: 5,
+    margin: 10,
     borderRadius: 160,
     backgroundColor: "#007AFF",
     alignItems: "center",
@@ -339,7 +406,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   outputText: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
     color: "#333",
     textAlign: "center",

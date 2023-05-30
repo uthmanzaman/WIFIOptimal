@@ -1,22 +1,24 @@
 /* eslint-disable no-undef */
 import "react-native-gesture-handler";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Ionic from "react-native-vector-icons/Ionicons";
 import MCIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import LoginScreen from "../Screens/LogIn";
-import SignupScreen from "../Screens/SignUp";
+import SignUp from '../Screens/SignUp';
 import SettingsPage from "../Screens/SettingsPage";
 import SpeedTest from "../Screens/SpeedTest";
 import WIFICoverage from "../Screens/WIFICoverage";
+import SignalAnalysis from "../Screens/SignalAnalysis";
 import DevicesPage from "../Screens/DevicesPage";
 import Details from "../Screens/Details";
 
-
-import {UserContext} from "./Context.js"
+import { UserContext } from "./Context.js";
 import { useFonts } from "expo-font";
+import SplashScreen from 'react-native-splash-screen';
+
 
 const AppStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -32,8 +34,16 @@ const App = () => {
     InterLight: require("./Assets/fonts/Inter-Light.ttf"),
   });
 
-  if (!loaded) return null;
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     SplashScreen.hide();
+  //   }, 2000);
+  // }, []);
+
+
+ 
   const TabsNav = () => {
+    
     return (
       <Tab.Navigator
         screenOptions={({ route }) => ({
@@ -53,6 +63,11 @@ const App = () => {
             } else if (route.name === "WIFI Coverage") {
               iconName = focused ? "wifi" : "wifi-outline";
               size = focused ? size + 8 : size + 5;
+            } else if (route.name === "Signal Analysis") {
+              iconName = focused ? "signal-cellular-3" : "signal-cellular-outline";
+              size = focused ? size + 8 : size + 5;
+              return <MCIcons name={iconName} size={size} color={color} />;
+
             }
             return <Ionic name={iconName} size={size} color={color} />;
           },
@@ -62,12 +77,13 @@ const App = () => {
         <Tab.Screen name="Devices Page" component={DevicesPage} />
         <Tab.Screen name="Speed Test" component={SpeedTest} />
         <Tab.Screen name="WIFI Coverage" component={WIFICoverage} />
+        <Tab.Screen name="Signal Analysis" component={SignalAnalysis} />
         <Tab.Screen name="Settings Page" component={SettingsPage} />
       </Tab.Navigator>
     );
   };
   return (
-    <UserContext.Provider value={{userUID, setUserUID}}>
+    <UserContext.Provider value={{ userUID, setUserUID }}>
       <NavigationContainer>
         <AppStack.Navigator
           initialRouteName="Login"
@@ -75,10 +91,8 @@ const App = () => {
         >
           <AppStack.Screen name="TabsNav" component={TabsNav} />
           <AppStack.Screen name="Login" component={LoginScreen} />
-          <AppStack.Screen name="Signup" component={SignupScreen} />
+          <AppStack.Screen name="SignUp" component={SignUp} />
           <AppStack.Screen name="Details" component={Details} />
-
-
         </AppStack.Navigator>
       </NavigationContainer>
     </UserContext.Provider>

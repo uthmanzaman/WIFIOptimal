@@ -1,12 +1,29 @@
-import React from 'react';
-import {View, Text, TextInput, StyleSheet, TouchableOpacity} from 'react-native';
-import {windowHeight, windowWidth} from '../utils/Dimensions';
+/* eslint-disable react/prop-types */
+import React from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { windowHeight, windowWidth } from "../utils/Dimensions";
 
 import { COLORS, SIZES, FONTS } from "../constants";
 
-import AntDesign from 'react-native-vector-icons/AntDesign';
+import AntDesign from "react-native-vector-icons/AntDesign";
 
-const FormInput = ({labelValue, placeholderText, iconType, ...rest}) => {
+const FormInput = ({
+  labelValue,
+  placeholderText,
+  iconType,
+  onChangeText,
+  keyboardType,
+  autoCapitalize,
+  autoCorrect,
+  secureTextEntry,
+  ...rest
+}) => {
   return (
     <View style={styles.inputContainer}>
       <View style={styles.iconStyle}>
@@ -18,6 +35,11 @@ const FormInput = ({labelValue, placeholderText, iconType, ...rest}) => {
         numberOfLines={1}
         placeholder={placeholderText}
         placeholderTextColor="#666"
+        onChangeText={onChangeText}
+        keyboardType={keyboardType || "default"}
+        autoCapitalize={autoCapitalize || false}
+        autoCorrect={autoCorrect || false}
+        secureTextEntry={secureTextEntry || false}
         {...rest}
       />
     </View>
@@ -55,21 +77,21 @@ const styles = StyleSheet.create({
   inputContainer: {
     marginTop: 5,
     marginBottom: 10,
-    width: '100%',
+    width: "100%",
     height: windowHeight / 15,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 3,
     borderWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
   iconStyle: {
     padding: 10,
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRightColor: '#ccc',
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRightColor: "#ccc",
     borderRightWidth: 1,
     width: 50,
   },
@@ -77,10 +99,10 @@ const styles = StyleSheet.create({
     padding: 10,
     flex: 1,
     fontSize: 16,
-    fontFamily: 'Lato-Regular',
-    color: '#333',
-    justifyContent: 'center',
-    alignItems: 'center',
+    fontFamily: "Lato-Regular",
+    color: "#333",
+    justifyContent: "center",
+    alignItems: "center",
   },
   inputField: {
     padding: 10,

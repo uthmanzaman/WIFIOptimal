@@ -56,7 +56,7 @@ const Ping = () => {
         ) : (
           <>
           {pingResults !== null && (
-            <Text sstyle={styles.resultText}>Ping Result: {pingResults}ms</Text>
+            <Text sstyle={styles.resultText}>Latency: {pingResults} ms</Text>
           )}
 
           {error && (
@@ -91,7 +91,6 @@ const styles = StyleSheet.create({
     width: 300,
     padding: 20,
     borderWidth: 2,
-    borderColor: "black",
     borderRadius: 10,
     backgroundColor: "white",
     alignItems: "center",

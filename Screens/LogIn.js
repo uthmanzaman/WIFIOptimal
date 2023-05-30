@@ -17,6 +17,7 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, app } from "../firebase";
 
 import { COLORS } from "../app/constants";
+import { FocusedStatusBar } from "../app/Components";
 
 import { UserContext } from "../app/Context.js";
 
@@ -50,6 +51,8 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <FocusedStatusBar backgroundColor={COLORS.secondary} />
+
       <View style={styles.container}>
         <Image source={require("../app/Assets/logo.png")} style={styles.logo} />
         <Text style={styles.text}>WIFI Optimal</Text>
@@ -103,7 +106,7 @@ const LoginScreen = ({ navigation }) => {
           onPress={() => navigation.navigate("SignUp")}
         >
           <Text style={styles.navButtonText}>
-            Don't have an acount? Create here
+            Dont have an acount? Create here
           </Text>
         </TouchableOpacity>
       </View>

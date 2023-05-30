@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,64 +9,29 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-//import getWifiList from '../app/Components/WIFIList';
-
-import wifi from "react-native-wifi-reborn";
-
 import { FAQCard, HomeHeader, FocusedStatusBar } from "../app/Components";
 import { faqData } from "../app/constants";
 import { COLORS, SIZES, FONTS } from "../app/constants";
 
-import MCIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { AntDesign } from "@expo/vector-icons";
 
 export const WIFICoverage = () => {
-  const [wifiListObject, setWifiListObject] = useState([{}]);
   const [showModal, setShowModal] = useState(false);
-  const [faqDataObject, setFaqDataObject] = useState(faqData);
   const [test, setTest] = useState("");
   const [helpful, setHelpful] = useState(null);
-
-  const handleSearch = (value) => {
-    if (value.length === 0) {
-      setFaqDataObject(faqData);
-    }
-
-    const filteredData = faqData.filter((item) =>
-      item.name.toLowerCase().includes(value.toLowerCase())
-    );
-
-    if (filteredData.length === 0) {
-      setFaqDataObject(faqData);
-    } else {
-      setFaqDataObject(filteredData);
-    }
-  };
-
-  const list = async () => {
-    let wifiList = await wifi.loadWifiList(); //wifiList will be Array<WifiEntry>
-    //console.log('wifi-List',wifiList);
-    setWifiListObject(wifiList[0]);
-    //console.log([wifiListObject])
-  };
 
   const handleVote = (isHelpful) => {
     setHelpful(isHelpful === helpful ? null : isHelpful);
   };
 
   const showFeedbackAlert = (isHelpful) => {
-    const message = isHelpful ? 'Thank you for your feedback! It was helpful' : 'Thank you for your feedback! It was helpful';
-    Alert.alert(
-      'Feedback',
-      message,
-      [{ text: 'OK', onPress: () => {} }],
-      { cancelable: false }
-    );
+    const message = isHelpful
+      ? "Thank you for your feedback! It was helpful"
+      : "Thank you for your feedback! It was helpful";
+    Alert.alert("Feedback", message, [{ text: "OK", onPress: () => {} }], {
+      cancelable: false,
+    });
   };
-
-  useEffect(() => {
-    list();
-  }, []);
 
   const FAQModal = () => {
     const lines = test.description.split(". ");
@@ -103,16 +67,16 @@ export const WIFICoverage = () => {
                   color: "white",
                 }}
               >
-                Description __
+                Description
               </Text>
 
-  
               {lines.map((bullet, index) => (
                 <View key={index} style={styles.bulletContainer}>
                   <Text style={styles.bullet}>•</Text>
                   <Text style={styles.text}>{bullet}</Text>
                 </View>
               ))}
+
               {helpful === null && (
                 <View style={styles.feedbackContainer}>
                   <TouchableOpacity
@@ -122,7 +86,7 @@ export const WIFICoverage = () => {
                       showFeedbackAlert();
                     }}
                   >
-                    <AntDesign name="like1" size={24} color="green" />
+                    <AntDesign name="like1" size={20} color="green" />
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.voteButton, styles.thumbsDownButton]}
@@ -131,7 +95,7 @@ export const WIFICoverage = () => {
                       showFeedbackAlert();
                     }}
                   >
-                    <AntDesign name="dislike1" size={24} color="red" />
+                    <AntDesign name="dislike1" size={20} color="red" />
                   </TouchableOpacity>
                 </View>
               )}
@@ -222,13 +186,13 @@ const styles = StyleSheet.create({
   bullet: {
     marginRight: 5,
     fontSize: 32,
-    color: 'white',
+    color: "white",
   },
   text: {
     fontSize: 16,
     lineHeight: 24,
-    color: 'white',
-    textAlign: 'justify',
+    color: "white",
+    textAlign: "justify",
   },
   paragraph: {
     fontSize: 16,
@@ -237,28 +201,29 @@ const styles = StyleSheet.create({
     textAlign: "justify",
   },
   feedbackContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 16,
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 20,
+    // backgroundColor: COLORS.secondary,
   },
   voteButton: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginHorizontal: 16,
   },
   thumbsUpButton: {
-    backgroundColor: '#e6ffe6',
+    backgroundColor: "#e6ffe6",
   },
   thumbsDownButton: {
-    backgroundColor: '#ffe6e6',
+    backgroundColor: "#ffe6e6",
   },
   feedbackText: {
     fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
+    color: "#333",
+    textAlign: "center",
     marginTop: 16,
   },
 });

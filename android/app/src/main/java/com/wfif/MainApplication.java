@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.res.Configuration;
 import androidx.annotation.NonNull;
 
+
+
 //import com.tradle.react.UdpSocketsModule; 
 //import com.pusherman.networkinfo.RNNetworkInfoPackage;
 
@@ -15,6 +17,10 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.soloader.SoLoader;
+
+import com.facebook.react.modules.core.PermissionListener;
+import com.facebook.react.modules.core.PermissionAwareActivity;
+
 import com.wifioptimal.newarchitecture.MainApplicationReactNativeHost;
 
 import expo.modules.ApplicationLifecycleDispatcher;
@@ -31,6 +37,11 @@ public class MainApplication extends Application implements ReactApplication {
     public boolean getUseDeveloperSupport() {
       return BuildConfig.DEBUG;
     }
+
+    private PermissionListener permissionListener;
+
+
+    
 
     
     

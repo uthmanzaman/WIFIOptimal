@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
@@ -12,100 +14,104 @@ import {
   Platform,
 } from "react-native";
 
-import MCIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { getAuth } from "firebase/auth";
 
 import { COLORS } from "../app/constants";
 import { FocusedStatusBar } from "../app/Components";
 import FeatherIcon from "react-native-vector-icons/Feather";
-import WifiManager from 'react-native-wifi-reborn';
-import NetInfo from '@react-native-community/netinfo';
+import WifiManager from "react-native-wifi-reborn";
+import NetInfo from "@react-native-community/netinfo";
 
 const SettingsPage = ({ navigation }) => {
   const [wifiEnabled, setWifiEnabled] = useState(false);
-
-
-  useEffect(() => {
-    const checkWifiStatus = async () => {
-      try {
-        if (Platform.OS === 'android') {
-          const isEnabled = await WifiManager.isEnabled();
-          setWifiEnabled(isEnabled);
-        } else if (Platform.OS === 'ios') {
-          const state = await NetInfo.fetch();
-          const isConnected = state.isConnected && state.type === 'wifi';
-          setWifiEnabled(isConnected);
-        }
-      } catch (error) {
-        Alert.alert('Error', 'Failed to check WiFi status.');
-        console.log('Error checking WiFi status:', error);
-      }
-    };
-
-    checkWifiStatus();
-  }, []);
-
-  const toggleWifi = async () => {
-    try {
-      if (Platform.OS === 'android') {
-        await WifiManager.setEnabled(!wifiEnabled);
-        setWifiEnabled(!wifiEnabled);
-      } else if (Platform.OS === 'ios') {
-        Alert.alert('Info', 'Please manually toggle WiFi in device settings.');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to toggle WiFi.');
-      console.log('Error toggling WiFi:', error);
-    }
-  };
-
-
-
+  const [userEmail, setUserEmail] = useState("");
 
   const SECTIONS = [
     {
       header: "Preferences",
       icon: "settings",
-      items: [
-        { label: "Language", value: "English", type: "input" },
-        { label: "Dark Mode", type: "boolean" },
-        { label: "Toggle Wi-Fi",  type: "boolean" },
-      ],
+      items: [{ label: "Toggle Wi-Fi", type: "boolean" }],
     },
     {
       header: "Edit Profile",
       icon: "help-circle",
       items: [
         { label: "Change Password", type: "input" },
-        { label: "Change Email", type: "input", value: true },
-        { label: "Delete Account", type: "input" },
+        {
+          label: "Delete Account",
+          type: "input",
+          onPress: handleDeleteAccount,
+          
+        },
       ],
     },
   ];
-
-  function Example() {
-    const [value, setValue] = React.useState(0);
-    const { tabs, items } = React.useMemo(() => {
-      return {
-        tabs: SECTIONS.map(({ header, icon }) => ({
-          name: header,
-          icon,
-        })),
-        items: SECTIONS[value].items,
-      };
-    }, [value]);
-  }
 
   function logout() {
     //Log out function navigates user back to login once signed out clicked
     const auth = getAuth();
     auth.signOut().then((userCredentials) => {
       const user = userCredentials.user;
-      console.log("Has LOGGED OUT", user.email);
-    });
+      console.log("Has LOGGED OUT", user);
+    })
+    .catch(error =>(error.message))
     navigation.navigate("Login");
-    //.catch(error =>(error.message))
   }
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Confirm Account Deletion",
+      "Are you sure you want to delete your account?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: confirmDeleteAccount,
+        },
+      ]
+    );
+  };
+
+  const confirmDeleteAccount = () => {
+    const user = getAuth().currentUser;
+
+    user
+      .delete()
+      .then(() => {
+        console.log("User account deleted successfully");
+        navigation.navigate("Login");
+      })
+      .catch((error) => {
+        console.log("Error deleting user account:", error);
+      });
+  };
+
+  useEffect(() => {
+    const unsubscribe = getAuth().onAuthStateChanged((user) => {
+      if (user) {
+        setUserEmail(user.email);
+      } else {
+        setUserEmail("");
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const toggleWifi = async () => {
+    try {
+        await WifiManager.setEnabled(!wifiEnabled);
+        setWifiEnabled(!wifiEnabled);
+    } catch (error) {
+      Alert.alert("Error", "Failed to toggle WiFi.");
+      console.log("Error toggling WiFi:", error);
+    }
+  };
+
   const [value, setValue] = React.useState(0);
   const { tabs, items } = React.useMemo(() => {
     return {
@@ -124,14 +130,11 @@ const SettingsPage = ({ navigation }) => {
           <View style={styles.profileHeader}>
             <Image
               alt=""
-              source={{
-                uri: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2.5&w=256&h=256&q=80",
-              }}
+              source={require("../app/Assets/logo.png")}
               style={styles.profileAvatar}
             />
             <View style={styles.profileBody}>
-              <Text style={styles.profileName}>John Doe</Text>
-              <Text style={styles.profileHandle}>@john.doe</Text>
+              <Text style={styles.profileName}>{userEmail}</Text>
             </View>
           </View>
 
@@ -156,7 +159,7 @@ const SettingsPage = ({ navigation }) => {
                   key={name}
                   style={[
                     styles.tabWrapper,
-                    isActive && { borderBottomColor: "#6366f1" },
+                    isActive && { borderBottomColor: COLORS.primary },
                   ]}
                 >
                   <TouchableOpacity
@@ -166,7 +169,7 @@ const SettingsPage = ({ navigation }) => {
                   >
                     <View style={styles.tab}>
                       <FeatherIcon
-                        color={isActive ? "#6366f1" : "#6b7280"}
+                        color={isActive ? COLORS.primary : COLORS.primary}
                         name={icon}
                         size={16}
                       />
@@ -174,7 +177,7 @@ const SettingsPage = ({ navigation }) => {
                       <Text
                         style={[
                           styles.tabText,
-                          isActive && { color: "#6366f1" },
+                          isActive && { color: COLORS.primary },
                         ]}
                       >
                         {name}
@@ -197,7 +200,7 @@ const SettingsPage = ({ navigation }) => {
               >
                 <TouchableOpacity
                   onPress={() => {
-                    // handle onPress
+                    handleDeleteAccount();
                   }}
                 >
                   <View style={styles.row}>
@@ -219,7 +222,7 @@ const SettingsPage = ({ navigation }) => {
 
                     {(type === "input" || type === "link") && (
                       <FeatherIcon
-                        color="#7f7f7f"
+                        color={COLORS.primary}
                         name="chevron-right"
                         size={20}
                       />

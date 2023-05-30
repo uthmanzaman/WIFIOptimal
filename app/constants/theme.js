@@ -22,7 +22,6 @@ export const FONTS = {
   regular: "InterRegular",
   light: "InterLight",
 };
-
 export const SHADOWS = {
   light: {
     shadowColor: COLORS.gray,
@@ -54,7 +53,6 @@ export const SHADOWS = {
     },
     shadowOpacity: 0.41,
     shadowRadius: 9.11,
-
     elevation: 14,
   },
 };
