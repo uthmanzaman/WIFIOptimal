@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
                         console.log(e);
                     }
                 },
-                logout: async (email, password) => {
+                logout: async () => {
                     try {
                         await auth().signOut();
                     } catch (e) {

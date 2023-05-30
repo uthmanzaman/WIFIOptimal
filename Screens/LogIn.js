@@ -1,85 +1,87 @@
-import React, {useContext, useEffect, useState} from 'react';
+/* eslint-disable react/prop-types */
+/* eslint-disable no-undef */
+import React, { useEffect, useState, useContext } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   Image,
-  Platform,
   StyleSheet,
-  ScrollView,
-  Alert
-} from 'react-native';
-import FormInput from '../app/Components/FormInput';
-import FormButton from '../app/Components/FormButton';
+  SafeAreaView,
+} from "react-native";
+import FormInput from "../app/Components/FormInput";
+import FormButton from "../app/Components/FormButton";
 
-import { getAuth ,signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
-import {auth, app} from '../firebase';
+import { auth, app } from "../firebase";
 
+import { COLORS } from "../app/constants";
+import { FocusedStatusBar } from "../app/Components";
 
-const LoginScreen = ({navigation}) => {
+import { UserContext } from "../app/Context.js";
+
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+  const { userUID, setUserUID } = useContext(UserContext);
 
-  //const {login, googleLogin, fbLogin} = useContext(AuthContext);
-
-  useEffect(() =>{
+  useEffect(() => {
     const auth = getAuth(app);
-   const unsubscribe = auth.onAuthStateChanged(user =>{
-      if (user){
-        navigation.navigate('TabsNav')
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        navigation.navigate("TabsNav");
       }
-    })
-    return unsubscribe
-  },[])
+    });
+    return unsubscribe;
+  }, []);
 
-  function handleLogIn(){
-    auth   
-      signInWithEmailAndPassword(auth,email, password)
-      .then (userCredentials => {
+  function handleLogIn() {
+    auth;
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredentials) => {
         const user = userCredentials.user;
-        console.log (user.email);
-        navigation.navigate('TabsNav')
+        console.log(user.uid);
+        console.log(user.email);
+        setUserUID(user.uid);
+        navigation.navigate("TabsNav");
       })
-      .catch(error => alert(error.message))
-    }
+      .catch((error) => alert(error.message));
+  }
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require('../app/Assets/OWIFILogo.webp')}
-        style={styles.logo}
-      />
-      <Text style={styles.text}>WIFI Optimal</Text>
+    <SafeAreaView style={{ flex: 1 }}>
+      <FocusedStatusBar backgroundColor={COLORS.secondary} />
 
-      <FormInput
-        labelValue={email}
-        onChangeText={(userEmail) => setEmail(userEmail)}
-        placeholderText="Email"
-        iconType="user"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
+      <View style={styles.container}>
+        <Image source={require("../app/Assets/logo.png")} style={styles.logo} />
+        <Text style={styles.text}>WIFI Optimal</Text>
 
-      <FormInput
-        labelValue={password}
-        onChangeText={(userPassword) => setPassword(userPassword)}
-        placeholderText="Password"
-        iconType="lock"
-        secureTextEntry={true}
-      />
+        <FormInput
+          labelValue={email}
+          onChangeText={(userEmail) => setEmail(userEmail)}
+          placeholderText="Email"
+          iconType="user"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
 
-      <FormButton
-        buttonTitle="Sign In"
-        onPress={() => handleLogIn()}
-      />
+        <FormInput
+          labelValue={password}
+          onChangeText={(userPassword) => setPassword(userPassword)}
+          placeholderText="Password"
+          iconType="lock"
+          secureTextEntry={true}
+        />
 
-      <TouchableOpacity style={styles.forgotButton} onPress={() => {}}>
-        <Text style={styles.navButtonText}>Forgot Password?</Text>
-      </TouchableOpacity>
+        <FormButton buttonTitle="Sign In" onPress={() => handleLogIn()} />
 
-      {/* {Platform.OS === 'android' ? (
+        <TouchableOpacity style={styles.forgotButton} onPress={() => {}}>
+          <Text style={styles.navButtonText}>Forgot Password?</Text>
+        </TouchableOpacity>
+
+        {/* {Platform.OS === 'android' ? (
         <View>
           <SocialButton
             buttonTitle="Sign In with Facebook"
@@ -99,14 +101,16 @@ const LoginScreen = ({navigation}) => {
         </View>
       ) : null} */}
 
-      <TouchableOpacity
-        style={styles.forgotButton}
-        onPress={() => navigation.navigate('SignUp')}>
-        <Text style={styles.navButtonText}>
-          Don't have an acount? Create here
-        </Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity
+          style={styles.forgotButton}
+          onPress={() => navigation.navigate("SignUp")}
+        >
+          <Text style={styles.navButtonText}>
+            Dont have an acount? Create here
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -115,22 +119,22 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafd',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#f9fafd",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
-    paddingTop: 50
+    paddingTop: 50,
   },
   logo: {
     height: 150,
     width: 150,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   text: {
-    fontFamily: 'GillSans-Bold',
+    fontFamily: "GillSans-Bold",
     fontSize: 28,
     marginBottom: 10,
-    color: '#051d5f',
+    color: "#051d5f",
   },
   navButton: {
     marginTop: 15,
@@ -140,8 +144,8 @@ const styles = StyleSheet.create({
   },
   navButtonText: {
     fontSize: 18,
-    fontWeight: '500',
-    color: '#2e64e5',
-    fontFamily: 'Futura',
+    fontWeight: "500",
+    color: COLORS.primary,
+    fontFamily: "Futura",
   },
 });
